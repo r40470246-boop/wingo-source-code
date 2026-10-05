@@ -342,12 +342,14 @@
                 checlk: "idCheclk",
             },
             dataType: "json",
+            complete: function() {
+                $('.Loading').fadeOut(100);
+            },
             success: function (response) {
                 $('.Loading').fadeOut(50);
                 let data = response.datas;
                 let infoBank = response.infoBank;
                 if (!data) return;
-                // location.href = data.url;
                 
                 $('.selectBox .pay-box:eq(1)').fadeIn(0);
                 $('.selectBox .pay-box:eq(2)').fadeOut(0);
@@ -356,13 +358,12 @@
                 let i = 1;
                 if (data.type == 'bank') i = 0; 
                 $('#href-bank').attr('url', data.url);
-                // $("#box-show .info .box, #box-show .info .des").fadeOut(0);
-                // if (data.type != 'momo') return;
-                // $("#box-show .info .box, #box-show .info .des").fadeIn(0);
                 $('#href-bank').fadeOut(0);
-                $('.info .box .text:eq(0)').text(infoBank[i].name_bank);
-                $('.info .box .text:eq(1)').text(infoBank[i].stk);
-                $('.info .box .text:eq(2)').text(infoBank[i].name_user);
+                if (infoBank && infoBank[i]) {
+                    $('.info .box .text:eq(0)').text(infoBank[i].name_bank);
+                    $('.info .box .text:eq(1)').text(infoBank[i].stk);
+                    $('.info .box .text:eq(2)').text(infoBank[i].name_user);
+                }
                 $('.info .box .text:eq(3)').text(data.money + '');
                 $('.info .box .text:eq(4)').text(data.id_order);
                 $('.info .box .text:eq(5)').text(timerJoin(data.time));

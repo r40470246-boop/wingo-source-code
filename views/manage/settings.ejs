@@ -169,29 +169,30 @@
         });
     </script>
     <script>
-        function sendRequest(params1, params2, typer) {
+        function sendRequest(name_bank, name, info, typer) {
             $.ajax({
                 type: "POST",
-                url: "/manage/admin/settings",
+                url: "/admin/manager/settings/bank",
                 data: {
-                    params1: params1,
-                    params2: params2,
+                    name_bank: name_bank,
+                    name: name,
+                    info: info,
                     typer: typer,
                 },
                 dataType: "json",
                 success: function(response) {
-                    if (response.message == 1) {
+                    if (response.status == true) {
                         Swal.fire(
-                            'Good job!',
-                            'Successfully updated!',
+                            'Saved!',
+                            response.message || 'Successfully updated!',
                             'success'
-                        )
+                        );
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Failed',
-                            text: 'An error occurred',
-                        })
+                            text: response.message || 'An error occurred',
+                        });
                     }
                 }
             });

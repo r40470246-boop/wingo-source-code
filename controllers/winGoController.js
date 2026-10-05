@@ -389,26 +389,34 @@ const addWinGo = async (game) => {
         if (game == 5) join = 'wingo5';
         if (game == 10) join = 'wingo10';
 
-        const [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = "${join}" ORDER BY id DESC LIMIT 1 `);
+        let [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = "${join}" ORDER BY id DESC LIMIT 1 `);
+        if (!winGoNow || winGoNow.length === 0) {
+            let now = new Date();
+            let initialPeriod = now.getFullYear() + formateT(now.getMonth() + 1) + formateT(now.getDate()) + "0001";
+            await connection.execute(`INSERT INTO wingo (period, amount, game, status, time) VALUES (?, 0, ?, 0, ?)`, [initialPeriod, join, Date.now()]);
+            [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = "${join}" ORDER BY id DESC LIMIT 1 `);
+        }
         const [setting] = await connection.query('SELECT * FROM `admin` ');
         let period = winGoNow[0].period; // cầu hiện tại
         let amount = Math.floor(Math.random() * 10); // fallback
         let timeNow = Date.now();
 
         let nextResult = '';
-        if (game == 1) nextResult = setting[0].wingo1;
-        if (game == 3) nextResult = setting[0].wingo3;
-        if (game == 5) nextResult = setting[0].wingo5;
-        if (game == 10) nextResult = setting[0].wingo10;
+        if (setting && setting.length > 0) {
+            if (game == 1) nextResult = setting[0].wingo1;
+            if (game == 3) nextResult = setting[0].wingo3;
+            if (game == 5) nextResult = setting[0].wingo5;
+            if (game == 10) nextResult = setting[0].wingo10;
+        }
 
         let newArr = '';
-        if (nextResult == '-1') {
-            const [bets] = await connection.query('SELECT bet, money, amount FROM minutes_1 WHERE status = 0 AND stage = ? AND game = ?', [period, join]);
+        if (!nextResult || nextResult == '-1') {
+            const [bets] = await connection.query('SELECT * FROM minutes_1 WHERE status = 0 AND stage = ? AND game = ?', [period, join]);
             if (bets && bets.length > 0) {
                 let payouts = Array(10).fill(0);
                 for (let b of bets) {
                     let betVal = b.bet;
-                    let betMoney = Number(b.money) * Number(b.amount);
+                    let betMoney = Number(b.money || b.fee || 0) * Number(b.amount || 1);
                     for (let num = 0; num <= 9; num++) {
                         if (String(betVal) === String(num)) payouts[num] += betMoney * 9;
                         if (['x', 'g', 'green'].includes(betVal)) {
@@ -485,6 +493,7 @@ const handlingWinGo1P = async (typeid) => {
     if (typeid == 10) game = 'wingo10';
 
     const [winGoNow] = await connection.query(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
+    if (!winGoNow || winGoNow.length === 0) return;
     
     // update ket qua
     await connection.execute(`UPDATE minutes_1 SET result = ? WHERE status = 0 AND game = '${game}'`, [winGoNow[0].amount]);

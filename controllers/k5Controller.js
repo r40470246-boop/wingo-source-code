@@ -318,17 +318,25 @@ const add5D = async(game) => {
         let result2 = makeid(5);
         let timeNow = Date.now();
         let [k5D] = await connection.query(`SELECT period FROM 5d WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        if (!k5D || k5D.length === 0) {
+            let now = new Date();
+            let initialPeriod = now.getFullYear() + formateT(now.getMonth() + 1) + formateT(now.getDate()) + "0001";
+            await connection.execute(`INSERT INTO 5d (period, result, game, status, time) VALUES (?, "12345", ?, 0, ?)`, [initialPeriod, game, Date.now()]);
+            [k5D] = await connection.query(`SELECT period FROM 5d WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        }
         const [setting] = await connection.query('SELECT * FROM `admin` ');
         let period = k5D[0].period;
 
         let nextResult = '';
-        if (game == 1) nextResult = setting[0].k5d;
-        if (game == 3) nextResult = setting[0].k5d3;
-        if (game == 5) nextResult = setting[0].k5d5;
-        if (game == 10) nextResult = setting[0].k5d10;
+        if (setting && setting.length > 0) {
+            if (game == 1) nextResult = setting[0].k5d;
+            if (game == 3) nextResult = setting[0].k5d3;
+            if (game == 5) nextResult = setting[0].k5d5;
+            if (game == 10) nextResult = setting[0].k5d10;
+        }
 
         let newArr = '';
-        if (nextResult == '-1') {
+        if (!nextResult || nextResult == '-1') {
             await connection.execute(`UPDATE 5d SET result = ?,status = ? WHERE period = ? AND game = "${game}"`, [result2, 1, period]);
             newArr = '-1';
         } else {
@@ -364,6 +372,7 @@ const add5D = async(game) => {
 
 async function funHanding(game) {
     const [k5d] = await connection.query(`SELECT * FROM 5d WHERE status != 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+    if (!k5d || k5d.length === 0) return;
     let k5dInfo = k5d[0];
  
     // update ket qua

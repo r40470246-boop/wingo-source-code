@@ -597,19 +597,21 @@ const settingBank = async(req, res) => {
     if (typer == 'bank') {
         await connection.query(`UPDATE bank_recharge SET name_bank = ?, name_user = ?, stk = ? WHERE type = 'bank'`, [name_bank, name, info]);
         return res.status(200).json({
-            message: 'Thay đổi thành công',
+            message: 'Bank details saved successfully',
             status: true,
-            datas: recharge,
         });
     }
     if (typer == 'momo') {
         await connection.query(`UPDATE bank_recharge SET name_bank = ?, name_user = ?, stk = ? WHERE type = 'momo'`, [name_bank, name, info]);
         return res.status(200).json({
-            message: 'Thay đổi thành công',
+            message: 'UPI / Paytm details saved successfully',
             status: true,
-            datas: recharge,
         });
     }
+    return res.status(200).json({
+        message: 'Invalid payment type',
+        status: false,
+    });
 }
 
 const settingCskh = async(req, res) => {
