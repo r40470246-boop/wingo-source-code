@@ -645,6 +645,24 @@ $(".foot .right").click(function (e) {
     },
   });
 
+  setTimeout(() => {
+    $(".van-overlay").fadeOut();
+    $(".popup-join").css("transform", "translateY(600px)");
+    $(".betting-mark .amount-box .li, .multiple-box .li").css({
+      "background-color": "rgb(240, 240, 240)",
+      color: "rgb(0, 0, 0)",
+    });
+    $(".betting-mark .amount-box .li:eq(0), .multiple-box .li:eq(0)").css({
+      "background-color": "rgb(240, 240, 240)",
+      color: "rgb(255, 255, 255)",
+    });
+    $(".stepper-box .digit-box input").val(1);
+    $(".amount-box").attr("data-money", "1");
+    $(".foot .right span:eq(1)").text(1000 + "");
+    $(".foot .right").removeClass("block-click");
+  }, 500);
+});
+
 function showResultPopup(isWin, winAmount, period, bet) {
   let header = isWin 
     ? `<div style="color: #6abe57; font-size: 20px; font-weight: bold;">🎉 Congratulations!</div>`
@@ -677,24 +695,6 @@ function showResultPopup(isWin, winAmount, period, bet) {
   $('#result-popup-overlay').fadeIn(200);
   $('#result-popup-modal').fadeIn(200);
 }
-
-  setTimeout(() => {
-    $(".van-overlay").fadeOut();
-    $(".popup-join").css("transform", "translateY(600px)");
-    $(".betting-mark .amount-box .li, .multiple-box .li").css({
-      "background-color": "rgb(240, 240, 240)",
-      color: "rgb(0, 0, 0)",
-    });
-    $(".betting-mark .amount-box .li:eq(0), .multiple-box .li:eq(0)").css({
-      "background-color": "rgb(240, 240, 240)",
-      color: "rgb(255, 255, 255)",
-    });
-    $(".stepper-box .digit-box input").val(1);
-    $(".amount-box").attr("data-money", "1");
-    $(".foot .right span:eq(1)").text(1000 + "");
-    $(".foot .right").removeClass("block-click");
-  }, 500);
-});
 
 function showListOrder(list_orders, x) {
   if (list_orders.length == 0) {
@@ -836,7 +836,7 @@ function showListOrder2(list_orders, x) {
                                             ? '<span data-v-a9660e98="" class="state green">Success</span>'
                                             : list_orders.status == 2
                                             ? '<span data-v-a9660e98="" class="state red">Fail</span>'
-                                            : ""
+                                            : '<span data-v-a9660e98="" class="state yellow" style="color: #ff9800;">Pending</span>'
                                         }
                                     </div>
                                     <div data-v-a9660e98="" class="tiem">${timerJoin(
@@ -846,14 +846,14 @@ function showListOrder2(list_orders, x) {
                                 <div data-v-a9660e98="" class="money">
                                         ${
                                           list_orders.status == 1
-                                            ? '<span data-v-a9660e98="" class="success"> + ' +
-                                              list_orders.money * 2 +
+                                            ? '<span data-v-a9660e98="" class="success"> + ₹' +
+                                              (list_orders.get || (list_orders.money * 2)) +
                                               " </span>"
                                             : list_orders.status == 2
-                                            ? '<span data-v-a9660e98="" class="fail"> - ' +
+                                            ? '<span data-v-a9660e98="" class="fail"> - ₹' +
                                               list_orders.money +
                                               "</span>"
-                                            : ""
+                                            : '<span data-v-a9660e98="" class="pending" style="color: #ff9800;">Pending</span>'
                                         }
                                 </div>
                             </div>

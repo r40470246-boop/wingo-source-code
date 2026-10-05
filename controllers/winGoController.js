@@ -225,33 +225,37 @@ const betWinGo = async (req, res) => {
             status = ?,
             today = ?,
             time = ?`;
-            await connection.execute(sql, [id_product, userInfo.phone, userInfo.code, userInfo.invite, period, userInfo.level, total, x, fee, 0, gameJoin, join, 0, checkTime, timeNow]);
+            await connection.execute(sql, [id_product, userInfo.phone, userInfo.code || '', userInfo.invite || '', period, userInfo.level || 0, total, x, fee, 0, gameJoin, join, 0, checkTime, timeNow]);
             await connection.execute('UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ', [money * x, auth]);
             const [users] = await connection.query('SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
-            await rosesPlus(auth, money * x);
-            const [level] = await connection.query('SELECT * FROM level ');
-            let level0 = level[0] || { f1: 0.6, f2: 0.18, f3: 0.054, f4: 0.0162 };
-            const sql2 = `INSERT INTO roses SET 
-            phone = ?,
-            code = ?,
-            invite = ?,
-            f1 = ?,
-            f2 = ?,
-            f3 = ?,
-            f4 = ?,
-            time = ?`;
-            let total_m = money * x;
-            let f1 = (total_m / 100) * level0.f1;
-            let f2 = (total_m / 100) * level0.f2;
-            let f3 = (total_m / 100) * level0.f3;
-            let f4 = (total_m / 100) * level0.f4;
-            await connection.execute(sql2, [userInfo.phone, userInfo.code, userInfo.invite, f1, f2, f3, f4, timeNow]);
+            try {
+                await rosesPlus(auth, money * x);
+                const [level] = await connection.query('SELECT * FROM level ');
+                let level0 = (level && level.length > 0) ? level[0] : { f1: 0.6, f2: 0.18, f3: 0.054, f4: 0.0162 };
+                const sql2 = `INSERT INTO roses SET 
+                phone = ?,
+                code = ?,
+                invite = ?,
+                f1 = ?,
+                f2 = ?,
+                f3 = ?,
+                f4 = ?,
+                time = ?`;
+                let total_m = money * x;
+                let f1 = (total_m / 100) * level0.f1;
+                let f2 = (total_m / 100) * level0.f2;
+                let f3 = (total_m / 100) * level0.f3;
+                let f4 = (total_m / 100) * level0.f4;
+                await connection.execute(sql2, [userInfo.phone, userInfo.code || '', userInfo.invite || '', f1, f2, f3, f4, timeNow]);
+            } catch (errCommission) {
+                console.error('Error in commission calculation (bet placed regardless):', errCommission);
+            }
             return res.status(200).json({
                 message: 'Bet placed successfully!',
                 status: true,
                 data: result,
-                change: users[0].level,
-                money: users[0].money,
+                change: users[0] ? users[0].level : 0,
+                money: users[0] ? users[0].money : 0,
             });
         } else {
             return res.status(200).json({

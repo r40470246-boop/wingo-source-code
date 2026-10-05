@@ -15,6 +15,63 @@ dotenv.config();
 // Auto-seed and migrate database tables/columns if missing
 const initDB = async () => {
     try {
+        await connection.execute(`CREATE TABLE IF NOT EXISTS roses (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            phone VARCHAR(20) DEFAULT NULL,
+            code VARCHAR(50) DEFAULT NULL,
+            invite VARCHAR(50) DEFAULT NULL,
+            f1 DOUBLE DEFAULT 0,
+            f2 DOUBLE DEFAULT 0,
+            f3 DOUBLE DEFAULT 0,
+            f4 DOUBLE DEFAULT 0,
+            time VARCHAR(50) DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`);
+
+        await connection.execute(`CREATE TABLE IF NOT EXISTS level (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            level INT NOT NULL DEFAULT 0,
+            f1 DOUBLE DEFAULT 0,
+            f2 DOUBLE DEFAULT 0,
+            f3 DOUBLE DEFAULT 0,
+            f4 DOUBLE DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`);
+
+        const [lvlRows] = await connection.query('SELECT id FROM level');
+        if (!lvlRows || lvlRows.length === 0) {
+            await connection.execute("INSERT INTO level (level, f1, f2, f3, f4) VALUES (0, 0.6, 0.18, 0.054, 0.0162)");
+        }
+
+        await connection.execute(`CREATE TABLE IF NOT EXISTS wingo (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            period VARCHAR(50) NOT NULL,
+            amount INT DEFAULT 0,
+            game VARCHAR(20) NOT NULL,
+            status INT DEFAULT 0,
+            time VARCHAR(50) DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`);
+
+        await connection.execute(`CREATE TABLE IF NOT EXISTS minutes_1 (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            id_product VARCHAR(100) DEFAULT NULL,
+            phone VARCHAR(20) NOT NULL,
+            code VARCHAR(50) DEFAULT NULL,
+            invite VARCHAR(50) DEFAULT NULL,
+            stage VARCHAR(50) NOT NULL,
+            level INT DEFAULT 0,
+            money DOUBLE DEFAULT 0,
+            price DOUBLE DEFAULT 0,
+            amount INT DEFAULT 1,
+            fee DOUBLE DEFAULT 0,
+            get DOUBLE DEFAULT 0,
+            game VARCHAR(20) NOT NULL,
+            bet VARCHAR(20) NOT NULL,
+            result VARCHAR(50) DEFAULT NULL,
+            more VARCHAR(50) DEFAULT NULL,
+            status INT DEFAULT 0,
+            today VARCHAR(50) DEFAULT NULL,
+            time VARCHAR(50) DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`);
+
         await connection.execute(`CREATE TABLE IF NOT EXISTS bank_recharge (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name_bank VARCHAR(255) DEFAULT 'UPI',
