@@ -690,8 +690,6 @@ const recharge = async(req, res) => {
     });
 }
 
-}
-
 const addBank = async(req, res) => {
     let auth = req.cookies.auth;
     let name_bank = req.body.name_bank;
