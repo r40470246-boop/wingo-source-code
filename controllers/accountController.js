@@ -73,10 +73,11 @@ const login = async(req, res) => {
         if (rows.length == 1) {
             if (rows[0].status == 1) {
                 const { password, money, ip, veri, ip_address, status, time, ...others } = rows[0];
+                const secret = process.env.JWT_ACCESS_TOKEN || process.env.JWT_SECRET || "wingo_secret_key_12345";
                 const accessToken = jwt.sign({
                     user: {...others },
                     timeNow: timeNow
-                }, process.env.JWT_ACCESS_TOKEN, { expiresIn: "1d" });
+                }, secret, { expiresIn: "1d" });
                 await connection.execute('UPDATE `users` SET `token` = ? WHERE `phone` = ? ', [md5(accessToken), username]);
                 return res.status(200).json({
                     message: 'Login Sucess',
@@ -97,7 +98,11 @@ const login = async(req, res) => {
             });
         }
     } catch (error) {
-        if (error) console.log(error);
+        console.log(error);
+        return res.status(500).json({
+            message: 'Server Error: ' + error.message,
+            status: false
+        });
     }
 
 }
