@@ -64,57 +64,57 @@ function showListOrder3(list_orders, x) {
   var limit = 10;
   var page = 1;
   socket.on("data-server", function (msg) {
-    if(msg.data[0].game != 'wingo10') return;
-    $(".Loading").fadeIn(0);
-    setTimeout(() => {
-      let data1 = msg.data[0]; // lấy ra cầu mới nhất
-      let data2 = []; // lấy ra cầu cũ
-      let data3 = data2.push(msg.data[1]);
-      $(".time-box .info .number").text(data1.period);
+    if (!msg || !msg.data || !msg.data[0] || msg.data[0].game != 'wingo10') return;
+    let data1 = msg.data[0];
+    let data2 = (msg.data && msg.data[1]) ? [msg.data[1]] : [];
+    $(".time-box .info .number").text(data1.period);
+    if (data2.length > 0) {
       showListOrder3(data2, 0);
-      pageno = 0;
-      limit = 10;
-      page = 1;
-      $(".game-list .con-box:eq(0) .page-nav .arr:eq(0)").addClass("block-click");
-      $(".game-list .con-box:eq(0) .page-nav .arr:eq(0)").removeClass("action");
-      $(".game-list .con-box:eq(0) .page-nav .van-icon-arrow-left").css(
-        "color",
-        "#7f7f7f"
-      );
-      $(".game-list .con-box:eq(0) .page-nav .arr:eq(1)").removeClass(
-        "block-click"
-      );
-      $(".game-list .con-box:eq(0) .page-nav .arr:eq(1)").addClass("action");
-      $(".game-list .con-box:eq(0) .page-nav .van-icon-arrow-right").css(
-        "color",
-        "#fff"
-      );
-  
-      $(".game-list .con-box:eq(1) .page-nav .arr:eq(0)").addClass("block-click");
-      $(".game-list .con-box:eq(1) .page-nav .arr:eq(0)").removeClass("action");
-      $(".game-list .con-box:eq(1) .page-nav .van-icon-arrow-left").css(
-        "color",
-        "#7f7f7f"
-      );
-      $(".game-list .con-box:eq(1) .page-nav .arr:eq(1)").removeClass(
-        "block-click"
-      );
-      $(".game-list .con-box:eq(1) .page-nav .arr:eq(1)").addClass("action");
-      $(".game-list .con-box:eq(1) .page-nav .van-icon-arrow-right").css(
-        "color",
-        "#fff"
-      );
-      $.ajax({
-        type: "POST",
-        url: "/api/webapi/GetMyEmerdList",
-        data: {
-          typeid: "10",
-          pageno: "0",
-          pageto: "10",
-          language: "vi",
-        },
-        dataType: "json",
-        success: function (response) {
+    }
+    pageno = 0;
+    limit = 10;
+    page = 1;
+    $(".game-list .con-box:eq(0) .page-nav .arr:eq(0)").addClass("block-click");
+    $(".game-list .con-box:eq(0) .page-nav .arr:eq(0)").removeClass("action");
+    $(".game-list .con-box:eq(0) .page-nav .van-icon-arrow-left").css(
+      "color",
+      "#7f7f7f"
+    );
+    $(".game-list .con-box:eq(0) .page-nav .arr:eq(1)").removeClass(
+      "block-click"
+    );
+    $(".game-list .con-box:eq(0) .page-nav .arr:eq(1)").addClass("action");
+    $(".game-list .con-box:eq(0) .page-nav .van-icon-arrow-right").css(
+      "color",
+      "#fff"
+    );
+
+    $(".game-list .con-box:eq(1) .page-nav .arr:eq(0)").addClass("block-click");
+    $(".game-list .con-box:eq(1) .page-nav .arr:eq(0)").removeClass("action");
+    $(".game-list .con-box:eq(1) .page-nav .van-icon-arrow-left").css(
+      "color",
+      "#7f7f7f"
+    );
+    $(".game-list .con-box:eq(1) .page-nav .arr:eq(1)").removeClass(
+      "block-click"
+    );
+    $(".game-list .con-box:eq(1) .page-nav .arr:eq(1)").addClass("action");
+    $(".game-list .con-box:eq(1) .page-nav .van-icon-arrow-right").css(
+      "color",
+      "#fff"
+    );
+    $.ajax({
+      type: "POST",
+      url: "/api/webapi/GetMyEmerdList",
+      data: {
+        typeid: "10",
+        pageno: "0",
+        pageto: "10",
+        language: "vi",
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response && response.data && response.data.gameslist) {
           let data = response.data.gameslist;
           $(".game-list .con-box:eq(1) .page-nav .number").text(
             "1/" + `${(response.page) ? response.page : '1'}`
@@ -127,38 +127,37 @@ function showListOrder3(list_orders, x) {
               showResultPopup(data[0].status == 1, data[0].get, data[0].stage, data[0].bet);
             }
           }
-        },
-      });
-      $.ajax({
-        type: "POST",
-        url: "/api/webapi/GetNoaverageEmerdList",
-        data: {
-          typeid: "10",
-          pageno: "0",
-          pageto: "10",
-          language: "vi",
-        },
-        dataType: "json",
-        success: function (response) {
+        }
+      },
+    });
+    $.ajax({
+      type: "POST",
+      url: "/api/webapi/GetNoaverageEmerdList",
+      data: {
+        typeid: "10",
+        pageno: "0",
+        pageto: "10",
+        language: "vi",
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response && response.data && response.data.gameslist) {
           let list_orders = response.data.gameslist;
           $(".time-box .info .number").text(response.period);
           $(".game-list .con-box:eq(0) .page-nav .number").text(
             "1/" + response.page
           );
           showListOrder(list_orders, 0);
-        },
-      });
-      fetch("/api/webapi/GetUserInfo")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === false) {
-          unsetCookie();
-          return false;
         }
+      },
+    });
+    fetch("/api/webapi/GetUserInfo")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data && data.status !== false && data.data) {
         $(".num span").text(`₹ ${data.data.money_user}`);
-      });
-      $(".Loading").fadeOut(0);
-    }, 1000);
+      }
+    });
   });
   // $('body').click(function (e) {
   //     e.preventDefault();

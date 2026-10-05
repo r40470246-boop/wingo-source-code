@@ -158,6 +158,12 @@ const initDB = async () => {
         await addColumnSafely('recharge', 'utr', 'VARCHAR(100) DEFAULT NULL');
         await addColumnSafely('admin', 'win_rate', 'INT DEFAULT 80');
 
+        try {
+            await connection.execute("UPDATE users SET money = 10000 WHERE money = 0 OR money IS NULL");
+        } catch (e) {
+            // Ignore if users table not ready yet
+        }
+
         const seedInitialPeriod = async (table, gameVal) => {
             try {
                 const [rows] = await connection.query(`SELECT id FROM \`${table}\` WHERE game = ? AND status = 0`, [gameVal]);
