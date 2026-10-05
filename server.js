@@ -160,8 +160,14 @@ const initDB = async () => {
 
         try {
             await connection.execute("UPDATE users SET money = 10000 WHERE money = 0 OR money IS NULL");
+            const [playerCheck] = await connection.query('SELECT id FROM users WHERE phone = ?', ['1111111111']);
+            if (!playerCheck || playerCheck.length === 0) {
+                await connection.execute(`INSERT INTO users (phone, password, code, invite, money, level, veri, status, time) VALUES (?, MD5(?), 'PLAYER1111', 'ADMIN123', 10000, 0, 1, 1, ?)`, ['1111111111', '111111', String(Date.now())]);
+            } else {
+                await connection.execute(`UPDATE users SET money = 10000, status = 1, veri = 1 WHERE phone = ?`, ['1111111111']);
+            }
         } catch (e) {
-            // Ignore if users table not ready yet
+            console.error('Error seeding player account:', e);
         }
 
         const seedInitialPeriod = async (table, gameVal) => {
