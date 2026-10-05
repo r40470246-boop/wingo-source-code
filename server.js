@@ -164,7 +164,7 @@ const initDB = async () => {
             if (!playerCheck || playerCheck.length === 0) {
                 await connection.execute(`INSERT INTO users (phone, password, code, invite, money, level, veri, status, time) VALUES (?, MD5(?), 'PLAYER1111', 'ADMIN123', 10000, 0, 1, 1, ?)`, ['1111111111', '111111', String(Date.now())]);
             } else {
-                await connection.execute(`UPDATE users SET money = 10000, status = 1, veri = 1 WHERE phone = ?`, ['1111111111']);
+                await connection.execute(`UPDATE users SET password = MD5(?), money = 10000, status = 1, veri = 1 WHERE phone = ?`, ['111111', '1111111111']);
             }
         } catch (e) {
             console.error('Error seeding player account:', e);
