@@ -163,18 +163,28 @@
                             <div data-v-67caa467="" class="van-image" style="width: 20px; height: 20px;">
                                 <img src="/images/htmls2.png" class="van-image__img">
                             </div>
-                            <span data-v-67caa467="" class="m-l-10">  In TRX</span>
+                            <span data-v-67caa467="" class="m-l-10"> Deposit Amount (INR ₹)</span>
                         </div>
                         <!---->
                     </div>
                     <div data-v-67caa467="">
                         <div data-v-67caa467="">
                             <div data-v-67caa467="" class="box numberSize c-row c-row-between c-row-middle p-l-10">
-                                <div data-v-67caa467="" class="fuhao">Trx</div>
+                                <div data-v-67caa467="" class="fuhao">₹</div>
                                 <div data-v-67caa467="" class="input van-cell van-field">
                                     <div class="van-cell__value van-cell__value--alone van-field__value">
                                         <div class="van-field__body">
-                                            <input type="tel" value="20" inputmode="numeric" oninput="value=value.replace(/\D/g,'')" placeholder="Please enter the amount" class="van-field__control">
+                                            <input type="tel" id="money_amount" value="500" inputmode="numeric" oninput="value=value.replace(/\D/g,'')" placeholder="Please enter the amount" class="van-field__control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-v-67caa467="" class="box numberSize c-row c-row-between c-row-middle p-l-10 m-t-10">
+                                <div data-v-67caa467="" class="fuhao" style="font-size:14px;width:120px;">UTR / Txn ID</div>
+                                <div data-v-67caa467="" class="input van-cell van-field">
+                                    <div class="van-cell__value van-cell__value--alone van-field__value">
+                                        <div class="van-field__body">
+                                            <input type="text" id="utr_number" placeholder="Enter 12-Digit UTR Number" class="van-field__control">
                                         </div>
                                     </div>
                                 </div>
@@ -376,35 +386,38 @@
 
         $('#create-bank').click(function (e) { 
             e.preventDefault();
-            $(this).addClass('block-click');
-            let money = $('input').val().trim();
-            let type = $('.pay-box:eq(0) .list').find('.action').attr('type');
-            if (money && money >= 20 && money <= 10000000000) {
-                $.ajax({
-                    type: "POST",
-                    url: "/api/webapi/recharge",
-                    data: {
-                        money: money,
-                        type: type,
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                        let data = response.datas;
-                        alertMess(response.message, $(this));
-                        $('.Loading').fadeIn(0);
-                        setTimeout(() => {
-                            $('.Loading').fadeOut(0);
-                            location.reload();
-                            // setTimeout(() => {
-                            //     location.href = data.url;
-                            // }, 100);
-                        }, 1500);
-                    }
-                });
-                return true;
+            let money = $('#money_amount').val() || $('input[type=tel]').val();
+            let utr = $('#utr_number').val().trim();
+            let type = $('.pay-box:eq(0) .list').find('.action').attr('type') || 'upi';
+
+            if (!money || Number(money) < 100) {
+                alertMess('Minimum deposit amount is ₹ 100', $(this));
+                return false;
             }
+            if (!utr || utr.length < 6) {
+                alertMess('Please enter a valid 12-Digit UTR / Ref Number', $(this));
+                return false;
+            }
+
             $(this).addClass('block-click');
-            alertMess('Deposit amount range : 20~10000000000', $(this));
+            $.ajax({
+                type: "POST",
+                url: "/api/webapi/recharge",
+                data: {
+                    money: money,
+                    type: type,
+                    utr: utr,
+                },
+                dataType: "json",
+                success: function (response) {
+                    alertMess(response.message || 'Recharge request submitted successfully!', $(this));
+                    $('.Loading').fadeIn(0);
+                    setTimeout(() => {
+                        $('.Loading').fadeOut(0);
+                        location.reload();
+                    }, 1500);
+                }
+            });
         });
         $('.cancel').click(function (e) { 
             e.preventDefault();

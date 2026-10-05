@@ -30,7 +30,7 @@
         <div data-v-7b283485="" class="mian">
             <div data-v-106b99c8="" data-v-7b283485="" class="navbar">
                 <div data-v-106b99c8="" class="navbar-left"></div>
-                <div data-v-106b99c8="" class="navbar-title"> Ví tiền </div>
+                <div data-v-106b99c8="" class="navbar-title"> My Wallet </div>
                 <div data-v-106b99c8="" class="navbar-right" onclick="location.href='/keFuMenu'">
                     <div data-v-7b283485="" data-v-106b99c8="" class="c-row">
                         <img data-v-7b283485="" data-v-106b99c8=""
@@ -50,14 +50,14 @@
                 <div data-v-7b283485="" class="wallet-box">
                     <div data-v-7b283485="" class="box">
                         <div data-v-7b283485="" class="icon1"></div>
-                        <div data-v-7b283485="" class="title">Ví tiền</div>
+                        <div data-v-7b283485="" class="title">Wallet Balance</div>
                         <div data-v-7b283485="" class="balance m-t-10">
                             <div data-v-7b283485="" class="txt c-row c-row-middle">
-                                <img data-v-7b283485="" width="22px" height="18px" src="/images/tải xuống (2).png" class="m-r-5 img"> Số dư của tôi： </div>
+                                <img data-v-7b283485="" width="22px" height="18px" src="/images/tải xuống (2).png" class="m-r-5 img"> My Balance: </div>
                             <div data-v-7b283485="" class="c-row balanceMoney c-row-middle-center">
                                 <div data-v-7b283485="" class="money">
                                     <!---->
-                                    <div data-v-7b283485="">864.84<span data-v-7b283485="" class="p-l-10">Trx</span></div>
+                                    <div data-v-7b283485="">₹ 0.00</div>
                                 </div>
                                 <div data-v-7b283485="" id="reload">
                                     <div data-v-7b283485="" class="van-image img m-l-15" style="width: 25px; height: 25px;">
@@ -135,7 +135,7 @@
                 success: function (response) {
                     let user = response.data;
                     $('.wallet-user .name').text(user.name_user);
-                    $('.money').text(user.money_user + " trx");
+                    $('.money').text("₹ " + user.money_user);
                 }
             });
         });
@@ -146,9 +146,9 @@
             success: function (response) {
                 let user = response.data;
                 $('.wallet-user .name').text(user.name_user);
-                $('.money').text(user.money_user + ".00 ₫");
-                $('.balance .item:eq(0) div:eq(1)').text(response.totalRecharge + ".00 ₫");
-                $('.balance .item:eq(1) div:eq(1)').text(response.totalWithdraw + ".00 ₫");
+                $('.money').text("₹ " + user.money_user);
+                $('.balance .item:eq(0) div:eq(1)').text("₹ " + response.totalRecharge);
+                $('.balance .item:eq(1) div:eq(1)').text("₹ " + response.totalWithdraw);
             }
         });
     </script>

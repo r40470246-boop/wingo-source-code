@@ -126,7 +126,7 @@ function reload_money() {
                 unsetCookie();
                 return false;
             }
-            $(".num .moneyU").text(`Trx ${data.data.money_user} `);
+            $(".num .moneyU, .num span").text(`₹ ${data.data.money_user}`);
             $(".Loading").fadeOut(0);
         });
 }

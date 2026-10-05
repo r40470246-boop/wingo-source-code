@@ -612,117 +612,83 @@ const listMyTeam = async(req, res) => {
 const recharge = async(req, res) => {
     let auth = req.cookies.auth;
     let money = req.body.money;
-    let type = req.body.type;
+    let type = req.body.type || 'upi';
     let typeid = req.body.typeid;
+    let utr = req.body.utr || req.body.utr_number || req.body.transaction_id || '';
 
     if (type != 'cancel') {
-        if(!auth || !money || money < 50000) {
+        if(!auth || !money || Number(money) < 100) {
             return res.status(200).json({
-                message: 'Failed',
+                message: 'Minimum deposit amount is ₹ 100',
                 status: false,
-                timeStamp: timeNow,
-            })
-        }
-    }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `token` = ? ', [auth]);
-    let userInfo = user[0];
-    if(!user) {
-        return res.status(200).json({
-            message: 'Failed',
-            status: false,
-            timeStamp: timeNow,
-        });
-    };
-    if (type == 'cancel') {
-        await connection.query('UPDATE recharge SET status = 2 WHERE phone = ? AND id_order = ? AND status = ? ', [userInfo.phone, typeid, 0]);
-        return res.status(200).json({
-            message: 'Hủy đơn thành công',
-            status: true,
-            timeStamp: timeNow,
-        });
-    }
-    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = ? ', [userInfo.phone, 0]);
-    if (recharge.length == 0) {
-        let time = new Date().getTime();
-        const date = new Date();
-        function formateT(params) {
-            let result = (params < 10) ? "0" + params : params;
-            return result;
-        }
-        
-        function timerJoin(params = '') {
-            let date = '';
-            if (params) {
-                date = new Date(Number(params));
-            } else {
-                date = new Date();
-            }
-            let years = formateT(date.getFullYear());
-            let months = formateT(date.getMonth() + 1);
-            let days = formateT(date.getDate());
-            return years + '-' + months + '-' + days;
-        }
-        let checkTime = timerJoin(time);
-        let id_time = date.getUTCFullYear() + '' + date.getUTCMonth() + 1 + '' + date.getUTCDate();
-        let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1) ) + 10000000000000;
-        // let vat = Math.floor(Math.random() * (2000 - 0 + 1) ) + 0;
-
-        money = Number(money);
-        let client_transaction_id = id_time + id_order;
-        const formData = {
-            username: process.env.accountBank,
-            secret_key: process.env.secret_key,
-            client_transaction: client_transaction_id,
-            amount: money,
-        }
-
-        if (type == 'momo') {
-            const sql = `INSERT INTO recharge SET 
-            id_order = ?,
-            transaction_id = ?,
-            phone = ?,
-            money = ?,
-            type = ?,
-            status = ?,
-            today = ?,
-            url = ?,
-            time = ?`;
-            await connection.execute(sql, [client_transaction_id, 'NULL', userInfo.phone, money, type, 0, checkTime, 'NULL', time]);
-            const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = ? ', [userInfo.phone, 0]);
-            return res.status(200).json({
-                message: 'Nhận thành công',
-                datas: recharge[0],
-                status: true,
                 timeStamp: timeNow,
             });
         }
-
-        const sql = `INSERT INTO recharge SET 
-        id_order = ?,
-        transaction_id = ?,
-        phone = ?,
-        money = ?,
-        type = ?,
-        status = ?,
-        today = ?,
-        url = ?,
-        time = ?`; 
-        await connection.execute(sql, [client_transaction_id, '0', userInfo.phone, money, type, 0, checkTime, '0', time]);
-        const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = ? ', [userInfo.phone, 0]);
+    }
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `token` = ? ', [auth]);
+    if(!user || user.length === 0) {
         return res.status(200).json({
-            message: 'Tạo đơn thành công',
-            datas: recharge[0],
-            status: true,
+            message: 'User authentication failed',
+            status: false,
             timeStamp: timeNow,
         });
-    } else {
+    }
+    let userInfo = user[0];
+    if (type == 'cancel') {
+        await connection.query('UPDATE recharge SET status = 2 WHERE phone = ? AND id_order = ? AND status = ? ', [userInfo.phone, typeid, 0]);
         return res.status(200).json({
-            message: 'Nhận thành công',
-            datas: recharge[0],
+            message: 'Order cancelled successfully',
             status: true,
             timeStamp: timeNow,
         });
     }
+    
+    let time = new Date().getTime();
+    const date = new Date();
+    function formateT(params) {
+        let result = (params < 10) ? "0" + params : params;
+        return result;
+    }
+    
+    function timerJoin(params = '') {
+        let date = '';
+        if (params) {
+            date = new Date(Number(params));
+        } else {
+            date = new Date();
+        }
+        let years = formateT(date.getFullYear());
+        let months = formateT(date.getMonth() + 1);
+        let days = formateT(date.getDate());
+        return years + '-' + months + '-' + days;
+    }
+    let checkTime = timerJoin(time);
+    let id_time = date.getUTCFullYear() + '' + (date.getUTCMonth() + 1) + '' + date.getUTCDate();
+    let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1) ) + 10000000000000;
+
+    money = Number(money);
+    let client_transaction_id = id_time + id_order;
+
+    const sql = `INSERT INTO recharge SET 
+    id_order = ?,
+    transaction_id = ?,
+    phone = ?,
+    money = ?,
+    type = ?,
+    utr = ?,
+    status = ?,
+    today = ?,
+    url = ?,
+    time = ?`; 
+    await connection.execute(sql, [client_transaction_id, utr || '0', userInfo.phone, money, type, utr, 0, checkTime, '0', time]);
+    const [rechargeData] = await connection.query('SELECT * FROM recharge WHERE phone = ? ORDER BY id DESC LIMIT 1', [userInfo.phone]);
+    return res.status(200).json({
+        message: 'Recharge request submitted! Waiting for Admin approval.',
+        datas: rechargeData[0],
+        status: true,
+        timeStamp: timeNow,
+    });
+}
 
 }
 

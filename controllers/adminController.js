@@ -532,20 +532,19 @@ const rechargeDuyet = async(req, res) => {
     if (type == 'confirm') {
         await connection.query(`UPDATE recharge SET status = 1 WHERE id = ?`, [id]);
         const [info] = await connection.query(`SELECT * FROM recharge WHERE id = ?`, [id]);
-        await connection.query('UPDATE users SET money = money + ?, total_money = total_money + ? WHERE phone = ? ', [info[0].money, info[0].money, info[0].phone]);
+        if (info && info.length > 0) {
+            await connection.query('UPDATE users SET money = money + ? WHERE phone = ? ', [info[0].money, info[0].phone]);
+        }
         return res.status(200).json({
-            message: 'Xác nhận đơn thành công',
+            message: 'Recharge request approved successfully',
             status: true,
-            datas: recharge,
         });
     }
     if (type == 'delete') {
         await connection.query(`UPDATE recharge SET status = 2 WHERE id = ?`, [id]);
-
         return res.status(200).json({
-            message: 'Hủy đơn thành công',
+            message: 'Recharge request rejected successfully',
             status: true,
-            datas: recharge,
         });
     }
 }

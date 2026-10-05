@@ -78,6 +78,21 @@
 
                                 <div class="form-group">
                                     <div class="text-center">
+                                        <label for="edit-win-rate-val" style="color: #27ae60; font-weight: bold; font-size: 18px;">Automatic Winning Rate Control (%)</label>
+                                    </div>
+                                    <label style="color: #2c3e50;">Adjust Target User Win Rate Percentage (0% to 100%)</label>
+                                    <p class="text-muted" style="font-size: 13px;">
+                                        * Note: Lower win rate (e.g., 20% - 40%) maximizes house profit by choosing optimal numbers for user bets when in Auto Mode (-1).
+                                    </p>
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" id="edit-win-rate-val" min="0" max="100" placeholder="Target Win Rate %" value="80">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <button type="button" class="btn btn-success edit-win-rate-btn" style="width: 100%;">Save Win Rate Setting</button>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="text-center">
                                         <label for="telegram">Support & Telegram Links</label>
                                     </div>
                                     <label for="telegram" style="color: #3498db;">Telegram Group Link</label>
@@ -120,9 +135,38 @@
                 $('#telegram').val(response.settings[0].telegram);
                 $('#cskh').val(response.settings[0].cskh);
                 $('#myapp_web').val(response.settings[0].app);
+                if (response.settings && response.settings[0] && response.settings[0].win_rate !== undefined) {
+                    $('#edit-win-rate-val').val(response.settings[0].win_rate);
+                }
             }
         });
     </script>
+    <script>
+        $('.edit-win-rate-btn').click(function (e) {
+            e.preventDefault();
+            let val = $('#edit-win-rate-val').val();
+            $.ajax({
+                type: "POST",
+                url: "/admin/manager/settings/change",
+                data: {
+                    type: 'change-win_rate',
+                    value: val,
+                    bs: 'win_rate'
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.status == true) {
+                        Swal.fire('Saved!', 'Automatic Win Rate updated to ' + val + '%', 'success');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed',
+                            text: 'Failed to update win rate',
+                        });
+                    }
+                }
+            });
+        });
     <script>
         function sendRequest(params1, params2, typer) {
             $.ajax({

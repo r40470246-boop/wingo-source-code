@@ -235,7 +235,7 @@ function reload_money() {
                 unsetCookie();
                 return false;
             }
-            $(".num span").text(`${data.data.money_user}.00 ₫ `);
+            $("#money_show, .num span").text(`₹ ${data.data.money_user}`);
             $('.Loading').fadeOut(0);
         });
 }

@@ -148,7 +148,7 @@ socket.on("data-server", function (msg) {
         unsetCookie();
         return false;
       }
-      $(".num span").text(`Trx ${data.data.money_user}. `);
+      $(".num span").text(`₹ ${data.data.money_user}`);
     });
     $(".Loading").fadeOut(0);
   }, 1000);
@@ -197,7 +197,7 @@ fetch("/api/webapi/GetUserInfo")
       unsetCookie();
       return false;
     }
-    $(".num span").text(`Trx ${data.data.money_user} `);
+    $(".num span").text(`₹ ${data.data.money_user}`);
   });
 
 $(".reload_money").click(function (e) {
@@ -213,7 +213,7 @@ $(".reload_money").click(function (e) {
       unsetCookie();
       return false;
     }
-    $(".num span").text(`Trx ${data.data.money_user} `);
+    $(".num span").text(`₹ ${data.data.money_user}`);
   });
 });
 $(".van-overlay, .foot .left").click(function (e) {

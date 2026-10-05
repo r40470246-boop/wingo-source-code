@@ -392,7 +392,7 @@ const addWinGo = async (game) => {
         const [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = "${join}" ORDER BY id DESC LIMIT 1 `);
         const [setting] = await connection.query('SELECT * FROM `admin` ');
         let period = winGoNow[0].period; // cầu hiện tại
-        let amount = Math.floor(Math.random() * 10); // xanh đỏ tím
+        let amount = Math.floor(Math.random() * 10); // fallback
         let timeNow = Date.now();
 
         let nextResult = '';
@@ -403,6 +403,40 @@ const addWinGo = async (game) => {
 
         let newArr = '';
         if (nextResult == '-1') {
+            const [bets] = await connection.query('SELECT bet, money, amount FROM minutes_1 WHERE status = 0 AND stage = ? AND game = ?', [period, join]);
+            if (bets && bets.length > 0) {
+                let payouts = Array(10).fill(0);
+                for (let b of bets) {
+                    let betVal = b.bet;
+                    let betMoney = Number(b.money) * Number(b.amount);
+                    for (let num = 0; num <= 9; num++) {
+                        if (String(betVal) === String(num)) payouts[num] += betMoney * 9;
+                        if (['x', 'g', 'green'].includes(betVal)) {
+                            if ([1, 3, 7, 9].includes(num)) payouts[num] += betMoney * 2;
+                            if (num === 5) payouts[num] += betMoney * 1.5;
+                        }
+                        if (['d', 'r', 'red'].includes(betVal)) {
+                            if ([2, 4, 6, 8].includes(num)) payouts[num] += betMoney * 2;
+                            if (num === 0) payouts[num] += betMoney * 1.5;
+                        }
+                        if (['t', 'v', 'violet'].includes(betVal)) {
+                            if ([0, 5].includes(num)) payouts[num] += betMoney * 4.5;
+                        }
+                        if (['l', 'b', 'big'].includes(betVal)) {
+                            if (num >= 5) payouts[num] += betMoney * 2;
+                        }
+                        if (['n', 's', 'small'].includes(betVal)) {
+                            if (num < 5) payouts[num] += betMoney * 2;
+                        }
+                    }
+                }
+                let minPayout = Math.min(...payouts);
+                let bestOutcomes = [];
+                for (let i = 0; i < 10; i++) {
+                    if (payouts[i] === minPayout) bestOutcomes.push(i);
+                }
+                amount = bestOutcomes[Math.floor(Math.random() * bestOutcomes.length)];
+            }
             await connection.execute(`UPDATE wingo SET amount = ?,status = ? WHERE period = ? AND game = "${join}"`, [amount, 1, period]);
             newArr = '-1';
         } else {
