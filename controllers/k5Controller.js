@@ -132,11 +132,22 @@ const betK5D = async (req, res) => {
             });
         }
 
-        const [k5DNow] = await connection.query(`SELECT period FROM 5d WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        let [k5DNow] = await connection.query(`SELECT period FROM 5d WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        if (!k5DNow || k5DNow.length < 1) {
+            let date = new Date();
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let periodStr = years + months + days + "0001";
+            await connection.execute(`INSERT INTO \`5d\` (period, result, game, status, time) VALUES (?, '0', ?, 0, ?)`, [periodStr, Number(game), String(Date.now())]);
+            const [freshK5D] = await connection.query(`SELECT period FROM 5d WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+            k5DNow = freshK5D;
+        }
+
         const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
         if (k5DNow.length < 1 || user.length < 1) {
             return res.status(200).json({
-                message: 'Error!',
+                message: 'Invalid bet parameters or session expired!',
                 status: false
             });
         }

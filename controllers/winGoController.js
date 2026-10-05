@@ -102,12 +102,23 @@ const betWinGo = async (req, res) => {
         if (typeid == 3) gameJoin = 'wingo3';
         if (typeid == 5) gameJoin = 'wingo5';
         if (typeid == 10) gameJoin = 'wingo10';
-        const [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${gameJoin}' ORDER BY id DESC LIMIT 1 `);
+        let [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${gameJoin}' ORDER BY id DESC LIMIT 1 `);
+        if (!winGoNow || winGoNow.length === 0) {
+            let date = new Date();
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let periodStr = years + months + days + "0001";
+            await connection.execute(`INSERT INTO wingo (period, amount, game, status, time) VALUES (?, 0, ?, 0, ?)`, [periodStr, gameJoin, String(Date.now())]);
+            const [freshWinGo] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${gameJoin}' ORDER BY id DESC LIMIT 1 `);
+            winGoNow = freshWinGo;
+        }
+
         const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
         if (!winGoNow[0] || !user[0] || !isNumber(x) || !isNumber(money)) {
             return res.status(200).json({
-                message: 'Error!',
-                status: true
+                message: 'Invalid bet parameters or session expired!',
+                status: false
             });
         }
 

@@ -100,6 +100,38 @@ const initDB = async () => {
         await addColumnSafely('minutes_1', 'today', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('recharge', 'utr', 'VARCHAR(100) DEFAULT NULL');
         await addColumnSafely('admin', 'win_rate', 'INT DEFAULT 80');
+
+        const seedInitialPeriod = async (table, gameVal) => {
+            try {
+                const [rows] = await connection.query(`SELECT id FROM \`${table}\` WHERE game = ? AND status = 0`, [gameVal]);
+                if (!rows || rows.length === 0) {
+                    let date = new Date();
+                    let period = date.getFullYear().toString() + (date.getMonth() + 1).toString().padStart(2, '0') + date.getDate().toString().padStart(2, '0') + "0001";
+                    if (table === 'wingo') {
+                        await connection.execute(`INSERT INTO wingo (period, amount, game, status, time) VALUES (?, 0, ?, 0, ?)`, [period, String(gameVal), String(Date.now())]);
+                    } else if (table === '5d') {
+                        await connection.execute(`INSERT INTO \`5d\` (period, result, game, status, time) VALUES (?, '0', ?, 0, ?)`, [period, Number(gameVal), String(Date.now())]);
+                    } else if (table === 'k3') {
+                        await connection.execute(`INSERT INTO k3 (period, result, game, status, time) VALUES (?, '0', ?, 0, ?)`, [period, Number(gameVal), String(Date.now())]);
+                    }
+                }
+            } catch (err) {
+                console.error(`Seed ${table} error:`, err);
+            }
+        };
+
+        await seedInitialPeriod('wingo', 'wingo');
+        await seedInitialPeriod('wingo', 'wingo3');
+        await seedInitialPeriod('wingo', 'wingo5');
+        await seedInitialPeriod('wingo', 'wingo10');
+        await seedInitialPeriod('5d', 1);
+        await seedInitialPeriod('5d', 3);
+        await seedInitialPeriod('5d', 5);
+        await seedInitialPeriod('5d', 10);
+        await seedInitialPeriod('k3', 1);
+        await seedInitialPeriod('k3', 3);
+        await seedInitialPeriod('k3', 5);
+        await seedInitialPeriod('k3', 10);
     } catch (e) {
         console.error('Init DB error:', e);
     }

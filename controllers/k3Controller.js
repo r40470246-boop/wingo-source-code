@@ -117,11 +117,22 @@ const betK3 = async (req, res) => {
         //     });
         // }
 
-        const [k3Now] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        let [k3Now] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        if (!k3Now || k3Now.length < 1) {
+            let date = new Date();
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let periodStr = years + months + days + "0001";
+            await connection.execute(`INSERT INTO k3 (period, result, game, status, time) VALUES (?, '0', ?, 0, ?)`, [periodStr, Number(game), String(Date.now())]);
+            const [freshK3] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+            k3Now = freshK3;
+        }
+
         const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
         if (k3Now.length < 1 || user.length < 1) {
             return res.status(200).json({
-                message: 'Error!',
+                message: 'Invalid bet parameters or session expired!',
                 status: false
             });
         }
