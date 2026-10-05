@@ -320,12 +320,13 @@ const addK3 = async (game) => {
 }
 
 async function funHanding(game) {
-    const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
-    if (!k5d || k5d.length === 0) return;
-    let k5dInfo = k5d[0];
+    try {
+        const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        if (!k5d || k5d.length === 0) return;
+        let k5dInfo = k5d[0];
 
-    // update ket qua
-    await connection.execute(`UPDATE result_k3 SET result = ? WHERE status = 0 AND game = ${game}`, [k5dInfo.result]);
+        // update ket qua
+        await connection.execute(`UPDATE result_k3 SET result = ? WHERE status = 0 AND game = ${game}`, [k5dInfo.result]);
     let result = String(k5dInfo.result).split('');
     let total = 0;
     for (let i = 0; i < result.length; i++) {
@@ -692,6 +693,9 @@ async function funHanding(game) {
             }
         }   
     }
+    } catch (error) {
+        console.error('Error in K3 funHanding:', error);
+    }
 }
 
 const priceGet = {
@@ -733,7 +737,8 @@ const priceGet = {
 }
 
 async function plusMoney(game) {
-    const [order] = await connection.execute(`SELECT id, phone, bet, price, money, fee, amount, result, typeGame FROM result_k3 WHERE status = 0 AND game = ${game} `);
+    try {
+        const [order] = await connection.execute(`SELECT id, phone, bet, price, money, fee, amount, result, typeGame FROM result_k3 WHERE status = 0 AND game = ${game} `);
     for (let i = 0; i < order.length; i++) {
         let orders = order[i];
         let phone = orders.phone;
@@ -999,15 +1004,21 @@ async function plusMoney(game) {
             await connection.execute(sql, [nhan_duoc, phone]);
         }
     }
+    } catch (error) {
+        console.error('Error in K3 plusMoney:', error);
+    }
 }
 
 const handlingK3 = async (typeid) => {
+    try {
+        let game = Number(typeid);
 
-    let game = Number(typeid);
+        await funHanding(game);
 
-    await funHanding(game);
-
-    await plusMoney(game);
+        await plusMoney(game);
+    } catch (error) {
+        console.error('Error in K3 handlingK3:', error);
+    }
 }
 
 const listOrderOld = async (req, res) => {

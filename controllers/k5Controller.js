@@ -371,12 +371,13 @@ const add5D = async(game) => {
 }
 
 async function funHanding(game) {
-    const [k5d] = await connection.query(`SELECT * FROM 5d WHERE status != 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
-    if (!k5d || k5d.length === 0) return;
-    let k5dInfo = k5d[0];
- 
-    // update ket qua
-    await connection.execute(`UPDATE result_5d SET result = ? WHERE status = 0 AND game = ${game}`, [k5dInfo.result]);
+    try {
+        const [k5d] = await connection.query(`SELECT * FROM 5d WHERE status != 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
+        if (!k5d || k5d.length === 0) return;
+        let k5dInfo = k5d[0];
+     
+        // update ket qua
+        await connection.execute(`UPDATE result_5d SET result = ? WHERE status = 0 AND game = ${game}`, [k5dInfo.result]);
     let result = String(k5dInfo.result).split('');
     let a = result[0];
     let b = result[1];
@@ -553,35 +554,40 @@ async function funHanding(game) {
         if(total % 2 != 0) {
             await connection.execute(`UPDATE result_5d SET status = 2 WHERE join_bet = 'total' AND bet = 'c' `);
         };
+    } catch (error) {
+        console.error('Error in 5D funHanding:', error);
     }
 }
 
 const handling5D = async(typeid) => {
+    try {
+        let game = Number(typeid);
 
-    let game = Number(typeid);
+        await funHanding(game);
 
-    await funHanding(game);
+        const [order] = await connection.execute(`SELECT id, phone, bet, price, money, fee, amount FROM result_5d WHERE status = 0 AND game = ${game} `);
+        for (let i = 0; i < order.length; i++) {
+            let orders = order[i];
+            let id = orders.id;
+            let phone = orders.phone;
+            let nhan_duoc = 0;
+            let check = isNumber(orders.bet); 
+            if (check) {
+                let arr = orders.bet.split('');
+                let total = (orders.money / arr.length / orders.amount);
+                let fee = total * 0.02;
+                let price = total - fee;
+                nhan_duoc += price * 9;
+            } else {
+                nhan_duoc += orders.price * 2;
+            }
 
-    const [order] = await connection.execute(`SELECT id, phone, bet, price, money, fee, amount FROM result_5d WHERE status = 0 AND game = ${game} `);
-    for (let i = 0; i < order.length; i++) {
-        let orders = order[i];
-        let id = orders.id;
-        let phone = orders.phone;
-        let nhan_duoc = 0;
-        let check = isNumber(orders.bet); 
-        if (check) {
-            let arr = orders.bet.split('');
-            let total = (orders.money / arr.length / orders.amount);
-            let fee = total * 0.02;
-            let price = total - fee;
-            nhan_duoc += price * 9;
-        } else {
-            nhan_duoc += orders.price * 2;
+            await connection.execute('UPDATE `result_5d` SET `get` = ?, `status` = 1 WHERE `id` = ? ', [nhan_duoc, id]);
+            const sql = 'UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ';
+            await connection.execute(sql, [nhan_duoc, phone]);
         }
-
-        await connection.execute('UPDATE `result_5d` SET `get` = ?, `status` = 1 WHERE `id` = ? ', [nhan_duoc, id]);
-        const sql = 'UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ';
-        await connection.execute(sql, [nhan_duoc, phone]);
+    } catch (error) {
+        console.error('Error in 5D handling5D:', error);
     }
 }
 
