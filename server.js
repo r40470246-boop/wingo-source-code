@@ -10,6 +10,15 @@ import socketIoController from './controllers/socketIoController.js';
 
 dotenv.config();
 
+// Prevent server crash on unhandled async errors
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception thrown:', err);
+});
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -26,7 +35,7 @@ configViewEngine(app);
 // init Web Routes
 routes.initWebRouter(app);
 
-// Cron game 1 Phut 
+// Cron game scheduler
 cronJobContronler.cronJobGame1p(io);
 
 // Check socket connection
