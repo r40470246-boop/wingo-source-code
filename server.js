@@ -132,9 +132,13 @@ const initDB = async () => {
 
         const addColumnSafely = async (table, column, colDef) => {
             try {
-                await connection.execute(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${colDef};`);
+                const [cols] = await connection.query(`SHOW COLUMNS FROM \`${table}\` LIKE ?`, [column]);
+                if (!cols || cols.length === 0) {
+                    await connection.execute(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${colDef};`);
+                    console.log(`Successfully added column ${column} to table ${table}`);
+                }
             } catch (e) {
-                // Column likely already exists
+                console.error(`Error adding column ${column} to table ${table}:`, e.message);
             }
         };
 
@@ -144,6 +148,11 @@ const initDB = async () => {
         await addColumnSafely('result_5d', 'level', 'INT DEFAULT 0');
         await addColumnSafely('result_5d', 'money', 'DOUBLE DEFAULT 0');
         await addColumnSafely('result_5d', 'price', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_5d', 'amount', 'INT DEFAULT 1');
+        await addColumnSafely('result_5d', 'fee', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_5d', 'join_bet', 'VARCHAR(50) DEFAULT NULL');
+        await addColumnSafely('result_5d', 'bet', 'VARCHAR(50) DEFAULT NULL');
+
         await addColumnSafely('result_k3', 'result', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('result_k3', 'get', 'DOUBLE DEFAULT 0');
         await addColumnSafely('result_k3', 'id_product', 'VARCHAR(100) DEFAULT NULL');
@@ -151,10 +160,20 @@ const initDB = async () => {
         await addColumnSafely('result_k3', 'money', 'DOUBLE DEFAULT 0');
         await addColumnSafely('result_k3', 'price', 'DOUBLE DEFAULT 0');
         await addColumnSafely('result_k3', 'typeGame', 'VARCHAR(50) DEFAULT NULL');
+        await addColumnSafely('result_k3', 'amount', 'INT DEFAULT 1');
+        await addColumnSafely('result_k3', 'fee', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_k3', 'join_bet', 'VARCHAR(50) DEFAULT NULL');
+        await addColumnSafely('result_k3', 'bet', 'VARCHAR(50) DEFAULT NULL');
+
+        await addColumnSafely('minutes_1', 'result', 'VARCHAR(50) DEFAULT NULL');
+        await addColumnSafely('minutes_1', 'get', 'DOUBLE DEFAULT 0');
         await addColumnSafely('minutes_1', 'money', 'DOUBLE DEFAULT 0');
         await addColumnSafely('minutes_1', 'id_product', 'VARCHAR(100) DEFAULT NULL');
         await addColumnSafely('minutes_1', 'level', 'INT DEFAULT 0');
         await addColumnSafely('minutes_1', 'today', 'VARCHAR(50) DEFAULT NULL');
+        await addColumnSafely('minutes_1', 'fee', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('minutes_1', 'amount', 'INT DEFAULT 1');
+
         await addColumnSafely('recharge', 'utr', 'VARCHAR(100) DEFAULT NULL');
         await addColumnSafely('admin', 'win_rate', 'INT DEFAULT 80');
 
