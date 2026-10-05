@@ -89,13 +89,13 @@ const login = async(req, res) => {
                 }); 
             } else {
                 return res.status(200).json({
-                    message: 'Tài khoản đã bị khóa',
+                    message: 'Account is blocked',
                     status: false
                 });
             }
         } else {
             return res.status(200).json({
-                message: 'Tài khoản hoặc Mật khẩu không đúng',
+                message: 'Incorrect Phone Number or Password',
                 status: false
             });
         }
@@ -121,14 +121,14 @@ const register = async(req, res) => {
 
     if (!username || !pwd || !invitecode) {
         return res.status(200).json({
-            message: 'ERROR!!!',
+            message: 'Please fill in all required fields!',
             status: false
         });
     }
 
     if (username.length < 9 || username.length > 10 || !isNumber(username)) {
         return res.status(200).json({
-            message: 'phone error',
+            message: 'Invalid Phone Number format (10 digits required)',
             status: false
         });
     }
@@ -140,7 +140,7 @@ const register = async(req, res) => {
 
         if (check_u.length == 1 && check_u[0].veri == 1) {
             return res.status(200).json({
-                message: 'Số điện thoại đã được đăng ký',
+                message: 'Phone number is already registered',
                 status: false
             });
         } else {
@@ -156,18 +156,18 @@ const register = async(req, res) => {
                     await connection.execute(sql, [id_user, username, name_user, md5(pwd), 0, code, invitecode, ctv, 1, otp2, ip, 1, time]);
                     await connection.execute('INSERT INTO point_list SET phone = ?', [username]);
                     return res.status(200).json({
-                        message: 'Register Sucess',
+                        message: 'Register Success',
                         status: true
                     });
                 } else {
                     return res.status(200).json({
-                        message: 'Địa chỉ IP đã được đăng ký',
+                        message: 'IP address registration limit reached',
                         status: false
                     });
                 }
             } else {
                 return res.status(200).json({
-                    message: 'Mã người giới thiệu không tồn tại',
+                    message: 'Invitation code does not exist',
                     status: false
                 });
             }

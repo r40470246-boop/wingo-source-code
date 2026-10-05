@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cài đặt</title>
+    <title>Admin Settings</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -34,11 +34,10 @@
                     <div class="container-fluid">
                         <div class="row mb-2">
                             <div class="col-sm-6">
-                                <h1>Cài đặt</h1>
+                                <h1>Admin Settings & Controls</h1>
                             </div>
                         </div>
                     </div>
-                    <!-- /.container-fluid -->
                 </section>
 
                 <div class="container-fluid">
@@ -47,47 +46,47 @@
                             <div style="padding: 10px 20px;margin-bottom: 200px;">
                                 <div class="form-group">
                                     <div class="text-center">
-                                        <label for="quantity">Tăng | Giảm tiền cho thành viên</label>
+                                        <label for="quantity">Increase / Decrease Member Balance (INR ₹)</label>
                                     </div>
-                                    <input type="text" class="form-control" oninput="value=value.replace(/\D/g,'')" id="buff-id" placeholder="Nhập ID tài khoản"><br>
+                                    <input type="text" class="form-control" oninput="value=value.replace(/\D/g,'')" id="buff-id" placeholder="Enter Account Phone Number"><br>
                                     <select class="form-select mb-4" id="buff-acc" aria-label="Default select example">
-                                        <option selected value="">--------------- Chọn chức năng ---------------</option>
-                                        <option value="1">Tăng (+)</option>
-                                        <option value="2">Giảm (-)</option>
+                                        <option selected value="">--------------- Select Action ---------------</option>
+                                        <option value="1">Increase (+)</option>
+                                        <option value="2">Decrease (-)</option>
                                     </select>
 
-                                    <input type="text" class="form-control" oninput="value=value.replace(/\D/g,'')" id="buff-money" placeholder="Nhập số tiền">
-                                    <button type="submit" class="btn btn-primary" id="buff-username" style="width: 100%;">Khởi tạo</button>
+                                    <input type="text" class="form-control" oninput="value=value.replace(/\D/g,'')" id="buff-money" placeholder="Enter Amount in ₹">
+                                    <button type="submit" class="btn btn-primary" id="buff-username" style="width: 100%;">Submit</button>
                                 </div>
 
                                 <div class="form-group">
                                     <div class="text-center">
-                                        <label for="quantity">Thay đổi thông tin nạp tiền</label>
+                                        <label for="quantity">Recharge Payment Settings (India UPI / Bank)</label>
                                     </div>
-                                    <label for="quantity" style="color: #3498db;">BANKING</label>
-                                    <input type="text" class="form-control" placeholder="Tên ngân hàng" id="edit-banking-name_bank" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Tên chủ thẻ" id="edit-banking-name" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Số tài khoản" id="edit-banking-info" value=""><br>
-                                    <button type="submit" class="btn btn-primary edit-banking" style="width: 100%;margin-bottom: 20px;">Submit</button>
+                                    <label for="quantity" style="color: #3498db;">BANK TRANSFER / IFSC</label>
+                                    <input type="text" class="form-control" placeholder="Bank Name (e.g. HDFC / SBI / ICICI)" id="edit-banking-name_bank" value=""><br>
+                                    <input type="text" class="form-control" placeholder="Account Holder Name" id="edit-banking-name" value=""><br>
+                                    <input type="text" class="form-control" placeholder="Account Number / IFSC Code" id="edit-banking-info" value=""><br>
+                                    <button type="submit" class="btn btn-primary edit-banking" style="width: 100%;margin-bottom: 20px;">Save Bank Details</button>
                                     <!---------------------------------------------------------------->
-                                    <label for="quantity" style="color: #a50064;">MOMO</label>
-                                    <input type="text" class="form-control" placeholder="MOMO" id="edit-momo-name_bank" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Tên chủ ví" id="edit-momo-name" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Số điện thoại" id="edit-momo-info" value=""><br>
-                                    <button type="submit" class="btn btn-primary edit-momo" style="width: 100%;">Khởi tạo</button>
+                                    <label for="quantity" style="color: #a50064;">UPI / PAYTM / PHONEPE</label>
+                                    <input type="text" class="form-control" placeholder="Payment Method (e.g. UPI / Paytm)" id="edit-momo-name_bank" value=""><br>
+                                    <input type="text" class="form-control" placeholder="Name on UPI / Paytm" id="edit-momo-name" value=""><br>
+                                    <input type="text" class="form-control" placeholder="UPI ID / PhonePe Number" id="edit-momo-info" value=""><br>
+                                    <button type="submit" class="btn btn-primary edit-momo" style="width: 100%;">Save UPI Details</button>
                                 </div>
 
                                 <div class="form-group">
                                     <div class="text-center">
-                                        <label for="telegram">Telegram</label>
+                                        <label for="telegram">Support & Telegram Links</label>
                                     </div>
-                                    <label for="telegram" style="color: #3498db;">Telegram</label>
-                                    <input type="text" class="form-control" id="telegram" placeholder="Link Telegram" value=""><br>
-                                    <label for="cskh" style="color: #3498db;">Dịch vụ trực tuyến</label>
-                                    <input type="text" class="form-control" id="cskh" placeholder="Dịch vụ trực tuyến" value=""><br>
-                                    <label for="myapp_web" style="color: #3498db;">Link tải APP</label>
-                                    <input type="text" class="form-control" id="myapp_web" placeholder="Link tải APP" value=""><br>
-                                    <button type="submit" class="btn btn-primary telegram" style="width: 100%;">Khởi tạo</button>
+                                    <label for="telegram" style="color: #3498db;">Telegram Group Link</label>
+                                    <input type="text" class="form-control" id="telegram" placeholder="https://t.me/your_channel" value=""><br>
+                                    <label for="cskh" style="color: #3498db;">Customer Support Link</label>
+                                    <input type="text" class="form-control" id="cskh" placeholder="https://t.me/your_support" value=""><br>
+                                    <label for="myapp_web" style="color: #3498db;">App Download Link</label>
+                                    <input type="text" class="form-control" id="myapp_web" placeholder="App Download URL" value=""><br>
+                                    <button type="submit" class="btn btn-primary telegram" style="width: 100%;">Save Links</button>
                                 </div>
 
                             </div>
@@ -139,77 +138,38 @@
                     if (response.message == 1) {
                         Swal.fire(
                             'Good job!',
-                            'You clicked the button!',
+                            'Successfully updated!',
                             'success'
                         )
-                    } else if (response.message == 2) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Số điện thoại không tồn tại',
-                        })
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Lỗi không xác định !',
+                            title: 'Failed',
+                            text: 'An error occurred',
                         })
                     }
                 }
             });
         }
-
-        function sendRequestBank(name_bank = '', name = '', info = '', typer = '') {
-            $.ajax({
-                type: "POST",
-                url: "/admin/manager/settings/bank",
-                data: {
-                    name_bank: name_bank,
-                    name: name,
-                    info: info,
-                    typer: typer
-                },
-                dataType: "json",
-                success: function(response) {
-                    Swal.fire(
-                        'Good job!',
-                        'You clicked the button!',
-                        'success'
-                    )
-                }
-            });
-        }
-        $('.buff-money').click(function(e) {
+        $('.edit-banking').click(function (e) { 
             e.preventDefault();
-            const phone = $('#buff-phone').val();
-            const money = $('#buff-money').val();
-            const checkMoney = $.isNumeric(money);
-            if (phone && checkMoney) {
-                sendRequest(phone, money, "buff");
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Đang rỗng hoặc không đúng định dạng',
-                })
-            }
+            let name_bank = $('#edit-banking-name_bank').val();
+            let name = $('#edit-banking-name').val();
+            let info = $('#edit-banking-info').val();
+            sendRequest(name_bank, name, info, 'bank');
         });
-        $('.edit-momo').click(function(e) {
+        $('.edit-momo').click(function (e) { 
             e.preventDefault();
-            const name_bank = $('#edit-momo-name_bank').val();
-            const name = $('#edit-momo-name').val();
-            const info = $('#edit-momo-info').val();
-            sendRequestBank(name_bank, name, info, "momo");
+            let name_bank = $('#edit-momo-name_bank').val();
+            let name = $('#edit-momo-name').val();
+            let info = $('#edit-momo-info').val();
+            sendRequest(name_bank, name, info, 'momo');
         });
-        $('.edit-banking').click(function(e) {
+        $('.telegram').click(function (e) { 
             e.preventDefault();
-            const name_bank = $('#edit-banking-name_bank').val();
-            const name = $('#edit-banking-name').val();
-            const info = $('#edit-banking-info').val();
-            sendRequestBank(name_bank, name, info, "bank");
-        });
-        $('.telegram').click(function(e) {
-            e.preventDefault();
-            const telegram = $('#telegram').val();
-            const cskh = $('#cskh').val();
-            const myapp_web = $('#myapp_web').val();
+            let telegram = $('#telegram').val();
+            let cskh = $('#cskh').val();
+            let myapp_web = $('#myapp_web').val();
             $.ajax({
                 type: "POST",
                 url: "/admin/manager/settings/cskh",
@@ -223,55 +183,53 @@
                     if (response.status == true) {
                         Swal.fire(
                             'Good job!',
-                            'You clicked the button!',
+                            'Successfully updated!',
                             'success'
                         )
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Đang rỗng hoặc không đúng định dạng',
+                            title: 'Failed',
+                            text: 'An error occurred',
                         })
                     }
                 }
             });
         });
-
         $('#buff-username').click(function (e) { 
             e.preventDefault();
-            let id_user = $('#buff-id').val().trim();
-            let buff_acc = $('#buff-acc').val().trim();
-            let money_value = $('#buff-money').val().trim();
-            if (id_user && buff_acc && money_value) {
-                $.ajax({
-                    type: "POST",
-                    url: "/admin/manager/settings/buff",
-                    data: {
-                        id_user: id_user,
-                        buff_acc: buff_acc,
-                        money_value: money_value,
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                        if (response.status == true) {
-                            Swal.fire(
-                                'Good job!',
-                                '初始化成功',
-                                'success'
-                            )
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: '用户 ID 不存在',
-                            })
-                        }
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: '请输入完整信息',
-                })
+            let phone = $('#buff-id').val().trim();
+            let select = $('#buff-acc').val().trim();
+            let money = $('#buff-money').val().trim();
+            if (!phone || !select || !money) {
+                alert("Please fill in all required fields");
+                return;
             }
+            $.ajax({
+                type: "POST",
+                url: "/admin/manager/settings/buff",
+                data: {
+                    phone: phone,
+                    select: select,
+                    money: money,
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.status == true) {
+                        Swal.fire(
+                            'Good job!',
+                            response.message,
+                            'success'
+                        )
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed',
+                            text: response.message,
+                        })
+                    }
+                }
+            });
         });
     </script>
 </body>
