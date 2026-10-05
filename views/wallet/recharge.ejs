@@ -48,7 +48,7 @@
                     <div data-v-67caa467="" class="c-row c-row-middle">
                         <div data-v-67caa467="" class="money">
                             <!---->
-                            <div data-v-67caa467="">34871.40<span data-v-67caa467="" class="p-l-5">Trx</span></div>
+                            <div data-v-67caa467=""><span id="user_wallet_balance">0.00</span><span data-v-67caa467="" class="p-l-5">₹</span></div>
                         </div>
                         <div data-v-67caa467="" class="van-image img m-l-10" style="width: 18px; height: 18px;">
                             <img src="/images/reload.png" class="van-image__img">
@@ -61,102 +61,36 @@
                         <div data-v-67caa467="" class="van-image" style="width: 20px; height: 20px;">
                             <img src="/images/htmls2.png" class="van-image__img">
                         </div>
-                        <span data-v-67caa467="" class="m-l-10"> Payment Method </span>
+                        <span data-v-67caa467="" class="m-l-10"> Deposit Gateway </span>
                     </div>
                     <div data-v-67caa467="" class="list c-row c-flex-warp m-t-10">
-                        <div data-v-67caa467="" class="item action" type="bank">
+                        <div data-v-67caa467="" class="item action" type="upi" style="width: 45%;">
                             <img data-v-67caa467="" width="20px" height="20px" src="/images/recharge_TRANSFER_red.webp" class="img">
-                            <div data-v-67caa467="" class="name">Crypto</div>
-                          
-                            <!---->
+                            <div data-v-67caa467="" class="name">UPI / QR Pay</div>
+                        </div>
+                        <div data-v-67caa467="" class="item" type="usdt" style="width: 45%; margin-left: 10px;">
+                            <img data-v-67caa467="" width="20px" height="20px" src="/images/recharge_TRANSFER_red.webp" class="img">
+                            <div data-v-67caa467="" class="name">USDT / Crypto</div>
                         </div>
                     </div>
                 </div>
-                <div data-v-67caa467="" class="pay-box" style="display: none">
-                    <div data-v-67caa467="" class="title c-row c-row-middle c-row-between">
-                        <div data-v-67caa467="" class="c-row">
-                            <div data-v-67caa467="" class="van-image" style="width: 20px; height: 20px;"><img src="/images/htmls2.png" class="van-image__img" /></div>
-                            <span data-v-67caa467="" class="m-l-10"> Tron (TRC 20)  </span>
+
+                <!-- UPI / QR Payment Details Card -->
+                <div data-v-67caa467="" class="pay-box m-t-10" id="upi_info_card" style="background: #fff; padding: 15px; border-radius: 10px; margin: 10px 15px; border: 1px solid #e0e0e0;">
+                    <div style="font-weight: 600; color: #333; font-size: 14px; margin-bottom: 8px;">Scan & Pay via UPI App (GPay / PhonePe / Paytm)</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                        <div>
+                            <div style="font-size: 12px; color: #666;">Payee UPI ID:</div>
+                            <div id="display_upi_id" style="font-size: 15px; font-weight: bold; color: #d71212;">payee@upi</div>
                         </div>
-                        <div data-v-67caa467="" class="time">30:00</div>
+                        <button id="copy_upi_btn" onclick="navigator.clipboard.writeText($('#display_upi_id').text()); alert('UPI ID Copied!');" style="background: #d71212; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">Copy UPI</button>
                     </div>
-                    <div data-v-67caa467="" id="box-show">
-                        <div data-v-67caa467="" class="info">
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Assest</div>
-                                <div data-v-67caa467="" data-clipboard-text="VIETINBANK" class="c-row c-row-between con c-row-middle tag-read">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Address</div>
-                                <div data-v-67caa467="" class="c-row c-row-between con c-row-middle">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" data-clipboard-text="1068 7531 6411 " style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!---->
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Network</div>
-                                <div data-v-67caa467="" class="c-row c-row-between con c-row-middle">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" data-clipboard-text="" style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            
-                            </div>
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Amount</div>
-                                <div data-v-67caa467="" class="c-row c-row-between con c-row-middle">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" data-clipboard-text="51906" style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Order ID</div>
-                                <div data-v-67caa467="" class="c-row c-row-between con c-row-middle">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" data-clipboard-text="" style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div data-v-67caa467="" class="box c-row c-row-between c-row-middle">
-                                <div data-v-67caa467="" class="tit">Date</div>
-                                <div data-v-67caa467="" class="c-row c-row-between con c-row-middle">
-                                    <div data-v-67caa467="" class="text"></div>
-                                    <div data-v-67caa467="">
-                                        <div data-v-67caa467="" class="tag-read van-image" data-clipboard-text="03/07/2022" style="width: 22px; height: 20px;"><img src="/images/copy.png" class="van-image__img" /></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div data-v-67caa467="" class="des"> If you transfer the wrong amount as instructed, and the funds are lost, our company will not be held responsible! </div>
-                            <div data-v-67caa467="" class="des"> Note: Do not cancel the deposit order if the transfer has been completed.</div>
-                            <div data-v-67caa467="" class="btn-list c-row c-row-center m-t-30" id="href-bank">
-                                <div data-v-67caa467="" class="item flex-cover">
-                                    <div data-v-67caa467="" class="btn" style="background-image: linear-gradient(90deg,#d71212,#ff5851);">To continue with the payment.</div>
-                                </div>
-                                <!---->
-                            </div>
-                            <div data-v-67caa467="" class="btn-list c-row c-row-center m-t-30">
-                                <div data-v-67caa467="" class="item flex-cover">
-                                    <div data-v-67caa467="" class="btn cancel">Cancel</div>
-                                </div>
-                                <!---->
-                            </div>
-                        </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #555;">
+                        📌 Step 1: Copy UPI ID or Scan QR Code to complete payment in your UPI app.<br>
+                        📌 Step 2: Copy the 12-Digit UTR / Ref No. from your UPI receipt and paste below.
                     </div>
-                </div>                
-                <!---->
+                </div>
+
                 <div data-v-67caa467="" class="pay-box">
                     <div data-v-67caa467="" class="title c-row c-row-middle c-row-between">
                         <div data-v-67caa467="" class="c-row">
@@ -165,7 +99,6 @@
                             </div>
                             <span data-v-67caa467="" class="m-l-10"> Deposit Amount (INR ₹)</span>
                         </div>
-                        <!---->
                     </div>
                     <div data-v-67caa467="">
                         <div data-v-67caa467="">
@@ -179,19 +112,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div data-v-67caa467="" class="box numberSize c-row c-row-between c-row-middle p-l-10 m-t-10">
-                                <div data-v-67caa467="" class="fuhao" style="font-size:14px;width:120px;">UTR / Txn ID</div>
-                                <div data-v-67caa467="" class="input van-cell van-field">
+                            <div data-v-67caa467="" class="box numberSize c-row c-row-between c-row-middle p-l-10 m-t-10" style="flex-direction: column; align-items: flex-start; height: auto; padding: 10px;">
+                                <div style="font-weight: 600; font-size: 13px; color: #333; margin-bottom: 5px;">12-Digit UTR / Transaction Ref ID</div>
+                                <div data-v-67caa467="" class="input van-cell van-field" style="width: 100%;">
                                     <div class="van-cell__value van-cell__value--alone van-field__value">
                                         <div class="van-field__body">
-                                            <input type="text" id="utr_number" placeholder="Enter 12-Digit UTR Number" class="van-field__control">
+                                            <input type="text" id="utr_number" maxlength="12" placeholder="Enter 12-Digit UTR Number" class="van-field__control" style="width: 100%;">
                                         </div>
                                     </div>
                                 </div>
+                                <span id="utr_status" style="font-size: 12px; margin-top: 4px; font-weight: 600;"></span>
                             </div>
                             <div data-v-67caa467="" class="list m-t-10 c-row c-row-between c-flex-warp">
-                                <div data-v-67caa467="" data-money="50" class="li action">
-                                    <span data-v-67caa467="" class="number">50</span>
+                                <div data-v-67caa467="" data-money="100" class="li action">
+                                    <span data-v-67caa467="" class="number">100</span>
                                 </div>
                                 <div data-v-67caa467="" data-money="500" class="li">
                                     <span data-v-67caa467="" class="number">500</span>
@@ -199,24 +133,24 @@
                                 <div data-v-67caa467="" data-money="1000" class="li">
                                     <span data-v-67caa467="" class="number">1k</span>
                                 </div>
+                                <div data-v-67caa467="" data-money="5000" class="li">
+                                    <span data-v-67caa467="" class="number">5k</span>
+                                </div>
                                 <div data-v-67caa467="" data-money="10000" class="li">
                                     <span data-v-67caa467="" class="number">10k</span>
                                 </div>
-                                <div data-v-67caa467="" data-money="100000" class="li">
-                                    <span data-v-67caa467="" class="number">100k</span>
-                                </div>
-                                <div data-v-67caa467="" data-money="1000000" class="li">
-                                    <span data-v-67caa467="" class="number">1M</span>
+                                <div data-v-67caa467="" data-money="50000" class="li">
+                                    <span data-v-67caa467="" class="number">50k</span>
                                 </div>
                             </div>
                             <div data-v-67caa467="">
                                 <div data-v-67caa467="" class="des">
-                                    * The TRX payment gateway offers an additional 5% bonus on First deposit.
+                                    * Minimum deposit amount is ₹ 100.
                                 </div>
                                 <div data-v-67caa467="" class="des"> 
-                                    If you transfer the wrong amount as instructed, the funds will be lost, and our company will not be held responsible! </div>
+                                    * Enter the exact 12-digit UTR number from your payment receipt for instant admin verification. </div>
                                 <div data-v-67caa467="" class="des">
-                                    * Note: You must deposit the exact amount as instructed in the order. The system will automatically update the bonus funds.
+                                    * Do not submit fake or duplicate UTR numbers to avoid account suspension.
                                 </div>
                             </div>
                             <div data-v-67caa467="" class="btn-list c-row c-row-center m-t-30">
@@ -276,7 +210,7 @@
                 success: function (response) {
                     let user = response.data;
                     $('.wallet-user .name').text(user.name_user);
-                    $('.money').text(user.money_user + ".00 Trx");
+                    $('#user_wallet_balance').text(user.money_user);
                 }
             });
         });
@@ -287,7 +221,19 @@
             success: function (response) {
                 let user = response.data;
                 $('.wallet-user .name').text(user.name_user);
-                $('.money').text(user.money_user + ".00 Trx");
+                $('#user_wallet_balance').text(user.money_user);
+            }
+        });
+
+        $('#utr_number').on('input', function() {
+            let val = $(this).val().replace(/\D/g, '');
+            $(this).val(val);
+            if (val.length === 12) {
+                $('#utr_status').text('✔ Valid 12-Digit UTR Number').css('color', '#6abe57');
+            } else if (val.length > 0) {
+                $('#utr_status').text('UTR must be exactly 12 digits (' + val.length + '/12)').css('color', '#ed3935');
+            } else {
+                $('#utr_status').text('');
             }
         });
         $('input').on('input',(e) => {

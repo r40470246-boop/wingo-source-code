@@ -120,6 +120,13 @@ socket.on("data-server", function (msg) {
           "1/" + `${(response.page) ? response.page : '1'}`
         );
         showListOrder2(data, 1);
+        if (data && data.length > 0 && data[0].status != 0) {
+          let lastSeen = localStorage.getItem('last_seen_period_1');
+          if (data[0].stage !== lastSeen) {
+            localStorage.setItem('last_seen_period_1', data[0].stage);
+            showResultPopup(data[0].status == 1, data[0].get, data[0].stage, data[0].bet);
+          }
+        }
       },
     });
     $.ajax({
@@ -633,10 +640,43 @@ $(".foot .right").click(function (e) {
       alertMessJoin(response.message);
       if (response.status === false) return;
       $("#history-order").prepend(response.data);
-      $(".total-box .num span").text(response.money + ".00 ₫ ");
+      $(".num span").text("₹ " + response.money);
       socket.emit('data-server_2', { money: x * money, join, time: Date.now(), change: response.change });
     },
   });
+
+function showResultPopup(isWin, winAmount, period, bet) {
+  let header = isWin 
+    ? `<div style="color: #6abe57; font-size: 20px; font-weight: bold;">🎉 Congratulations!</div>`
+    : `<div style="color: #ed3935; font-size: 20px; font-weight: bold;">Better Luck Next Time!</div>`;
+  let body = isWin
+    ? `<div style="margin: 15px 0;">
+         <p style="font-size: 13px; color: #666; margin: 4px 0;">Period: <strong>${period}</strong></p>
+         <p style="font-size: 24px; color: #6abe57; font-weight: bold; margin: 10px 0;">+ ₹ ${winAmount}</p>
+         <p style="font-size: 12px; color: #888;">Your winnings have been credited to your balance!</p>
+       </div>`
+    : `<div style="margin: 15px 0;">
+         <p style="font-size: 13px; color: #666; margin: 4px 0;">Period: <strong>${period}</strong></p>
+         <p style="font-size: 16px; color: #ed3935; font-weight: bold; margin: 10px 0;">Bet Lost</p>
+         <p style="font-size: 12px; color: #888;">Try your luck in the next round!</p>
+       </div>`;
+
+  if ($('#result-popup-modal').length === 0) {
+    $('body').append(`
+      <div id="result-popup-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 320px; background: #fff; border-radius: 16px; text-align: center; z-index: 9999; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); display: none;">
+        <div id="result-popup-header"></div>
+        <div id="result-popup-body"></div>
+        <button onclick="$('#result-popup-modal').fadeOut(); $('#result-popup-overlay').fadeOut();" style="background: linear-gradient(90deg, #d71212, #ff5851); color: #fff; border: none; padding: 10px 30px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 80%; margin-top: 10px;">Close</button>
+      </div>
+      <div id="result-popup-overlay" onclick="$('#result-popup-modal').fadeOut(); $(this).fadeOut();" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9998; display: none;"></div>
+    `);
+  }
+
+  $('#result-popup-header').html(header);
+  $('#result-popup-body').html(body);
+  $('#result-popup-overlay').fadeIn(200);
+  $('#result-popup-modal').fadeIn(200);
+}
 
   setTimeout(() => {
     $(".van-overlay").fadeOut();

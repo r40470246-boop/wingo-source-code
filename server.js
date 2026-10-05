@@ -83,9 +83,21 @@ const initDB = async () => {
 
         await addColumnSafely('result_5d', 'result', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('result_5d', 'get', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_5d', 'id_product', 'VARCHAR(100) DEFAULT NULL');
+        await addColumnSafely('result_5d', 'level', 'INT DEFAULT 0');
+        await addColumnSafely('result_5d', 'money', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_5d', 'price', 'DOUBLE DEFAULT 0');
         await addColumnSafely('result_k3', 'result', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('result_k3', 'get', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_k3', 'id_product', 'VARCHAR(100) DEFAULT NULL');
+        await addColumnSafely('result_k3', 'level', 'INT DEFAULT 0');
+        await addColumnSafely('result_k3', 'money', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_k3', 'price', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('result_k3', 'typeGame', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('minutes_1', 'money', 'DOUBLE DEFAULT 0');
+        await addColumnSafely('minutes_1', 'id_product', 'VARCHAR(100) DEFAULT NULL');
+        await addColumnSafely('minutes_1', 'level', 'INT DEFAULT 0');
+        await addColumnSafely('minutes_1', 'today', 'VARCHAR(50) DEFAULT NULL');
         await addColumnSafely('recharge', 'utr', 'VARCHAR(100) DEFAULT NULL');
         await addColumnSafely('admin', 'win_rate', 'INT DEFAULT 80');
     } catch (e) {

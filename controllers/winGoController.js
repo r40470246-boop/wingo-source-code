@@ -86,165 +86,172 @@ const rosesPlus = async (auth, money) => {
 }
 
 const betWinGo = async (req, res) => {
-    let { typeid, join, x, money } = req.body;
-    let auth = req.cookies.auth;
+    try {
+        let { typeid, join, x, money } = req.body;
+        let auth = req.cookies.auth;
 
-    if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
-        return res.status(200).json({
-            message: 'Error!',
-            status: true
-        });
-    }
-
-    let gameJoin = '';
-    if (typeid == 1) gameJoin = 'wingo';
-    if (typeid == 3) gameJoin = 'wingo3';
-    if (typeid == 5) gameJoin = 'wingo5';
-    if (typeid == 10) gameJoin = 'wingo10';
-    const [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${gameJoin}' ORDER BY id DESC LIMIT 1 `);
-    const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
-    if (!winGoNow[0] || !user[0] || !isNumber(x) || !isNumber(money)) {
-        return res.status(200).json({
-            message: 'Error!',
-            status: true
-        });
-    }
-
-    let userInfo = user[0];
-    let period = winGoNow[0].period;
-    let fee = (x * money) * 0.02;
-    let total = (x * money) - fee;
-    let timeNow = Date.now();
-    let check = userInfo.money - total;
-
-    let date = new Date();
-    let years = formateT(date.getFullYear());
-    let months = formateT(date.getMonth() + 1);
-    let days = formateT(date.getDate());
-    let id_product = years + months + days + Math.floor(Math.random() * 1000000000000000);
-
-    let formatTime = timerJoin();
-
-    let color = '';
-    if (join == 'l') {
-        color = 'big';
-    } else if (join == 'n') {
-        color = 'small';
-    } else if (join == 't') {
-        color = 'violet';
-    } else if (join == 'd') {
-        color = 'red';
-    } else if (join == 'x') {
-        color = 'green';
-    } else if (join == '0') {
-        color = 'red-violet';
-    } else if (join == '5') {
-        color = 'green-violet';
-    } else if (join % 2 == 0) {
-        color = 'red';
-    } else if (join % 2 != 0) {
-        color = 'green';
-    }
-
-    let checkJoin = '';
-
-    if (!isNumber(join) && join == 'l' || join == 'n') {
-        checkJoin = `
-        <div data-v-a9660e98="" class="van-image" style="width: 30px; height: 30px;">
-            <img src="/images/${(join == 'n') ? 'small' : 'big'}.png" class="van-image__img">
-        </div>
-        `
-    } else {
-        checkJoin =
-            `
-        <span data-v-a9660e98="">${(isNumber(join)) ? join : ''}</span>
-        `
-    }
-
-
-    let result = `
-    <div data-v-a9660e98="" issuenumber="${period}" addtime="${formatTime}" rowid="1" class="hb">
-        <div data-v-a9660e98="" class="item c-row">
-            <div data-v-a9660e98="" class="result">
-                <div data-v-a9660e98="" class="select select-${(color)}">
-                    ${checkJoin}
-                </div>
-            </div>
-            <div data-v-a9660e98="" class="c-row c-row-between info">
-                <div data-v-a9660e98="">
-                    <div data-v-a9660e98="" class="issueName">
-                        ${period}
-                    </div>
-                    <div data-v-a9660e98="" class="tiem">${formatTime}</div>
-                </div>
-            </div>
-        </div>
-        <!---->
-    </div>
-    `;
-
-    function timerJoin(params = '') {
-        let date = '';
-        if (params) {
-            date = new Date(Number(params));
-        } else {
-            date = new Date();
+        if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
+            return res.status(200).json({
+                message: 'Error!',
+                status: true
+            });
         }
+
+        let gameJoin = '';
+        if (typeid == 1) gameJoin = 'wingo';
+        if (typeid == 3) gameJoin = 'wingo3';
+        if (typeid == 5) gameJoin = 'wingo5';
+        if (typeid == 10) gameJoin = 'wingo10';
+        const [winGoNow] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${gameJoin}' ORDER BY id DESC LIMIT 1 `);
+        const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
+        if (!winGoNow[0] || !user[0] || !isNumber(x) || !isNumber(money)) {
+            return res.status(200).json({
+                message: 'Error!',
+                status: true
+            });
+        }
+
+        let userInfo = user[0];
+        let period = winGoNow[0].period;
+        let fee = (x * money) * 0.02;
+        let total = (x * money) - fee;
+        let timeNow = Date.now();
+        let check = userInfo.money - (x * money);
+
+        let date = new Date();
         let years = formateT(date.getFullYear());
         let months = formateT(date.getMonth() + 1);
         let days = formateT(date.getDate());
-        return years + '-' + months + '-' + days;
-    }
-    let checkTime = timerJoin(date.getTime());
+        let id_product = years + months + days + Math.floor(Math.random() * 1000000000000000);
 
-    if (check >= 0) {
-        const sql = `INSERT INTO minutes_1 SET 
-        id_product = ?,
-        phone = ?,
-        code = ?,
-        invite = ?,
-        stage = ?,
-        level = ?,
-        money = ?,
-        amount = ?,
-        fee = ?,
-        get = ?,
-        game = ?,
-        bet = ?,
-        status = ?,
-        today = ?,
-        time = ?`;
-        await connection.execute(sql, [id_product, userInfo.phone, userInfo.code, userInfo.invite, period, userInfo.level, total, x, fee, 0, gameJoin, join, 0, checkTime, timeNow]);
-        await connection.execute('UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ', [money * x, auth]);
-        const [users] = await connection.query('SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
-        await rosesPlus(auth, money * x);
-        const [level] = await connection.query('SELECT * FROM level ');
-        let level0 = level[0];
-        const sql2 = `INSERT INTO roses SET 
-        phone = ?,
-        code = ?,
-        invite = ?,
-        f1 = ?,
-        f2 = ?,
-        f3 = ?,
-        f4 = ?,
-        time = ?`;
-        let total_m = money * x;
-        let f1 = (total_m / 100) * level0.f1;
-        let f2 = (total_m / 100) * level0.f2;
-        let f3 = (total_m / 100) * level0.f3;
-        let f4 = (total_m / 100) * level0.f4;
-        await connection.execute(sql2, [userInfo.phone, userInfo.code, userInfo.invite, f1, f2, f3, f4, timeNow]);
-        return res.status(200).json({
-            message: 'Đặt cược thành công',
-            status: true,
-            data: result,
-            change: users[0].level,
-            money: users[0].money,
-        });
-    } else {
-        return res.status(200).json({
-            message: 'Số tiền không đủ',
+        let formatTime = timerJoin();
+
+        let color = '';
+        if (join == 'l') {
+            color = 'big';
+        } else if (join == 'n') {
+            color = 'small';
+        } else if (join == 't') {
+            color = 'violet';
+        } else if (join == 'd') {
+            color = 'red';
+        } else if (join == 'x') {
+            color = 'green';
+        } else if (join == '0') {
+            color = 'red-violet';
+        } else if (join == '5') {
+            color = 'green-violet';
+        } else if (join % 2 == 0) {
+            color = 'red';
+        } else if (join % 2 != 0) {
+            color = 'green';
+        }
+
+        let checkJoin = '';
+
+        if (!isNumber(join) && join == 'l' || join == 'n') {
+            checkJoin = `
+            <div data-v-a9660e98="" class="van-image" style="width: 30px; height: 30px;">
+                <img src="/images/${(join == 'n') ? 'small' : 'big'}.png" class="van-image__img">
+            </div>
+            `
+        } else {
+            checkJoin =
+                `
+            <span data-v-a9660e98="">${(isNumber(join)) ? join : ''}</span>
+            `
+        }
+
+        let result = `
+        <div data-v-a9660e98="" issuenumber="${period}" addtime="${formatTime}" rowid="1" class="hb">
+            <div data-v-a9660e98="" class="item c-row">
+                <div data-v-a9660e98="" class="result">
+                    <div data-v-a9660e98="" class="select select-${(color)}">
+                        ${checkJoin}
+                    </div>
+                </div>
+                <div data-v-a9660e98="" class="c-row c-row-between info">
+                    <div data-v-a9660e98="">
+                        <div data-v-a9660e98="" class="issueName">
+                            ${period}
+                        </div>
+                        <div data-v-a9660e98="" class="tiem">${formatTime}</div>
+                    </div>
+                </div>
+            </div>
+            <!---->
+        </div>
+        `;
+
+        function timerJoinDate(params = '') {
+            let date = '';
+            if (params) {
+                date = new Date(Number(params));
+            } else {
+                date = new Date();
+            }
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            return years + '-' + months + '-' + days;
+        }
+        let checkTime = timerJoinDate(date.getTime());
+
+        if (check >= 0) {
+            const sql = `INSERT INTO minutes_1 SET 
+            id_product = ?,
+            phone = ?,
+            code = ?,
+            invite = ?,
+            stage = ?,
+            level = ?,
+            money = ?,
+            amount = ?,
+            fee = ?,
+            get = ?,
+            game = ?,
+            bet = ?,
+            status = ?,
+            today = ?,
+            time = ?`;
+            await connection.execute(sql, [id_product, userInfo.phone, userInfo.code, userInfo.invite, period, userInfo.level, total, x, fee, 0, gameJoin, join, 0, checkTime, timeNow]);
+            await connection.execute('UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ', [money * x, auth]);
+            const [users] = await connection.query('SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
+            await rosesPlus(auth, money * x);
+            const [level] = await connection.query('SELECT * FROM level ');
+            let level0 = level[0] || { f1: 0.6, f2: 0.18, f3: 0.054, f4: 0.0162 };
+            const sql2 = `INSERT INTO roses SET 
+            phone = ?,
+            code = ?,
+            invite = ?,
+            f1 = ?,
+            f2 = ?,
+            f3 = ?,
+            f4 = ?,
+            time = ?`;
+            let total_m = money * x;
+            let f1 = (total_m / 100) * level0.f1;
+            let f2 = (total_m / 100) * level0.f2;
+            let f3 = (total_m / 100) * level0.f3;
+            let f4 = (total_m / 100) * level0.f4;
+            await connection.execute(sql2, [userInfo.phone, userInfo.code, userInfo.invite, f1, f2, f3, f4, timeNow]);
+            return res.status(200).json({
+                message: 'Bet placed successfully!',
+                status: true,
+                data: result,
+                change: users[0].level,
+                money: users[0].money,
+            });
+        } else {
+            return res.status(200).json({
+                message: 'Insufficient balance',
+                status: false
+            });
+        }
+    } catch (error) {
+        console.error('Error in betWinGo:', error);
+        return res.status(500).json({
+            message: 'Failed to place bet. Please try again.',
             status: false
         });
     }
