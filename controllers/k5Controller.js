@@ -554,6 +554,7 @@ async function funHanding(game) {
         if(total % 2 != 0) {
             await connection.execute(`UPDATE result_5d SET status = 2 WHERE join_bet = 'total' AND bet = 'c' `);
         };
+    }
     } catch (error) {
         console.error('Error in 5D funHanding:', error);
     }
