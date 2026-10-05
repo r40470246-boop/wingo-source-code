@@ -1033,112 +1033,101 @@ const handlingK3 = async (typeid) => {
 }
 
 const listOrderOld = async (req, res) => {
-    let { gameJoin, pageno, pageto } = req.body;
-    let auth = req.cookies.auth;
+    try {
+        let { gameJoin, pageno, pageto } = req.body;
+        let auth = req.cookies.auth;
+        pageno = Number(pageno) || 0;
+        pageto = Number(pageto) || 10;
 
-    let checkGame = ['1', '3', '5', '10'].includes(String(gameJoin));
-    if (!checkGame || pageno < 0 || pageto < 0) {
+        let checkGame = ['1', '3', '5', '10'].includes(String(gameJoin));
+        if (!checkGame) {
+            return res.status(200).json({
+                code: 0,
+                msg: "Invalid game",
+                data: { gameslist: [] },
+                status: false
+            });
+        }
+        const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
+        let game = Number(gameJoin);
+
+        const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `);
+        const [k5dAll] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' `);
+        let [period] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
+        
+        if (!period || !period[0]) {
+            let date = new Date();
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let periodStr = years + months + days + "0001";
+            await connection.execute(`INSERT INTO k3 (period, result, game, status, time) VALUES (?, '0', ?, 0, ?)`, [periodStr, game, String(Date.now())]);
+            const [freshP] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
+            period = freshP;
+        }
+
+        let page = Math.ceil(k5dAll.length / 10) || 1;
         return res.status(200).json({
             code: 0,
-            msg: "Không còn dữ liệu",
+            msg: "Success",
             data: {
-                gameslist: [],
+                gameslist: k5d || [],
             },
-            status: false
+            period: period[0] ? period[0].period : '',
+            page: page,
+            status: true
         });
+    } catch (error) {
+        console.error('Error in K3 listOrderOld:', error);
+        return res.status(200).json({ code: 0, msg: "Error", data: { gameslist: [] }, status: true });
     }
-    const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
-
-    let game = Number(gameJoin);
-
-    const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `);
-    const [k5dAll] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' `);
-    const [period] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
-    if (k5d.length == 0) {
-        return res.status(200).json({
-            code: 0,
-            msg: "Không còn dữ liệu",
-            data: {
-                gameslist: [],
-            },
-            page: 1,
-            status: false
-        });
-    }
-    if (!pageno || !pageto || !user[0] || !k5d[0] || !period[0]) {
-        return res.status(200).json({
-            message: 'Error!',
-            status: false
-        });
-    }
-    let page = Math.ceil(k5dAll.length / 10);
-    return res.status(200).json({
-        code: 0,
-        msg: "Nhận thành công",
-        data: {
-            gameslist: k5d,
-        },
-        period: period[0].period,
-        page: page,
-        status: true
-    });
 }
 
 const GetMyEmerdList = async (req, res) => {
-    let { gameJoin, pageno, pageto } = req.body;
-    let auth = req.cookies.auth;
+    try {
+        let { gameJoin, pageno, pageto } = req.body;
+        let auth = req.cookies.auth;
+        pageno = Number(pageno) || 0;
+        pageto = Number(pageto) || 10;
 
-    let checkGame = ['1', '3', '5', '10'].includes(String(gameJoin));
-    if (!checkGame || pageno < 0 || pageto < 0) {
+        let checkGame = ['1', '3', '5', '10'].includes(String(gameJoin));
+        if (!checkGame) {
+            return res.status(200).json({
+                code: 0,
+                msg: "Invalid game",
+                data: { gameslist: [] },
+                status: false
+            });
+        }
+
+        let game = Number(gameJoin);
+        const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
+        if (!user || !user[0]) {
+            return res.status(200).json({ code: 0, msg: "Unauthorized", data: { gameslist: [] }, status: false });
+        }
+
+        const [result_5d] = await connection.query(`SELECT * FROM result_k3 WHERE phone = ? AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto}`, [user[0].phone]);
+        const [result_5dAll] = await connection.query(`SELECT * FROM result_k3 WHERE phone = ? AND game = '${game}' ORDER BY id DESC `, [user[0].phone]);
+
+        let page = Math.ceil(result_5dAll.length / 10) || 1;
+        let datas = (result_5d || []).map((data) => {
+            let { id, phone, code, invite, level, game, ...others } = data;
+            return others;
+        });
+
         return res.status(200).json({
             code: 0,
-            msg: "Không còn dữ liệu",
+            msg: "Success",
             data: {
-                gameslist: [],
+                gameslist: datas,
             },
-            status: false
-        });
-    }
-
-    let game = Number(gameJoin);
-
-    const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
-    const [result_5d] = await connection.query(`SELECT * FROM result_k3 WHERE phone = ? AND game = '${game}' ORDER BY id DESC LIMIT ${Number(pageno) + ',' + Number(pageto)}`, [user[0].phone]);
-    const [result_5dAll] = await connection.query(`SELECT * FROM result_k3 WHERE phone = ? AND game = '${game}' ORDER BY id DESC `, [user[0].phone]);
-
-    if (!result_5d[0]) {
-        return res.status(200).json({
-            code: 0,
-            msg: "Không còn dữ liệu",
-            data: {
-                gameslist: [],
-            },
-            page: 1,
-            status: false
-        });
-    }
-    if (!pageno || !pageto || !user[0] || !result_5d[0]) {
-        return res.status(200).json({
-            message: 'Error!',
+            page: page,
             status: true
         });
+    } catch (error) {
+        console.error('Error in K3 GetMyEmerdList:', error);
+        return res.status(200).json({ code: 0, msg: "Error", data: { gameslist: [] }, status: true });
     }
-    let page = Math.ceil(result_5dAll.length / 10);
-
-    let datas = result_5d.map((data) => {
-        let { id, phone, code, invite, level, game, ...others } = data;
-        return others;
-    });
-
-    return res.status(200).json({
-        code: 0,
-        msg: "Nhận thành công",
-        data: {
-            gameslist: datas,
-        },
-        page: page,
-        status: true
-    });
 }
 
 

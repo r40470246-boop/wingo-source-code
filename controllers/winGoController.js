@@ -269,134 +269,104 @@ const betWinGo = async (req, res) => {
 }
 
 const listOrderOld = async (req, res) => {
-    let { typeid, pageno, pageto } = req.body;
+    try {
+        let { typeid, pageno, pageto } = req.body;
+        pageno = Number(pageno) || 0;
+        pageto = Number(pageto) || 10;
 
-    if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
-        return res.status(200).json({
-            message: 'Error!',
-            status: true
-        });
-    }
-    if (pageno < 0 || pageto < 0) {
+        if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
+            return res.status(200).json({
+                message: 'Error!',
+                status: false
+            });
+        }
+        let auth = req.cookies.auth;
+        const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
+
+        let game = '';
+        if (typeid == 1) game = 'wingo';
+        if (typeid == 3) game = 'wingo3';
+        if (typeid == 5) game = 'wingo5';
+        if (typeid == 10) game = 'wingo10';
+
+        const [wingo] = await connection.query(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `);
+        const [wingoAll] = await connection.query(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' `);
+        let [period] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
+        
+        if (!period || !period[0]) {
+            let date = new Date();
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let periodStr = years + months + days + "0001";
+            await connection.execute(`INSERT INTO wingo (period, amount, game, status, time) VALUES (?, 0, ?, 0, ?)`, [periodStr, game, String(Date.now())]);
+            const [freshP] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
+            period = freshP;
+        }
+
+        let page = Math.ceil(wingoAll.length / 10) || 1;
         return res.status(200).json({
             code: 0,
-            msg: "Không còn dữ liệu",
+            msg: "Success",
             data: {
-                gameslist: [],
+                gameslist: wingo || [],
             },
-            status: false
-        });
-    }
-    let auth = req.cookies.auth;
-    const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [auth]);
-
-    let game = '';
-    if (typeid == 1) game = 'wingo';
-    if (typeid == 3) game = 'wingo3';
-    if (typeid == 5) game = 'wingo5';
-    if (typeid == 10) game = 'wingo10';
-
-    const [wingo] = await connection.query(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `);
-    const [wingoAll] = await connection.query(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' `);
-    const [period] = await connection.query(`SELECT period FROM wingo WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
-    if (!wingo[0]) {
-        return res.status(200).json({
-            code: 0,
-            msg: "Không còn dữ liệu",
-            data: {
-                gameslist: [],
-            },
-            status: false
-        });
-    }
-    if (!pageno || !pageto || !user[0] || !wingo[0] || !period[0]) {
-        return res.status(200).json({
-            message: 'Error!',
+            period: period[0] ? period[0].period : '',
+            page: page,
             status: true
         });
+    } catch (error) {
+        console.error('Error in winGo listOrderOld:', error);
+        return res.status(200).json({ code: 0, msg: "Error", data: { gameslist: [] }, status: true });
     }
-    let page = Math.ceil(wingoAll.length / 10);
-    return res.status(200).json({
-        code: 0,
-        msg: "Nhận thành công",
-        data: {
-            gameslist: wingo,
-        },
-        period: period[0].period,
-        page: page,
-        status: true
-    });
 }
 
 const GetMyEmerdList = async (req, res) => {
-    let { typeid, pageno, pageto } = req.body;
+    try {
+        let { typeid, pageno, pageto } = req.body;
+        pageno = Number(pageno) || 0;
+        pageto = Number(pageto) || 10;
 
-    // if (!pageno || !pageto) {
-    //     pageno = 0;
-    //     pageto = 10;
-    // }
+        if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
+            return res.status(200).json({
+                message: 'Error!',
+                status: false
+            });
+        }
+        let auth = req.cookies.auth;
+        let game = '';
+        if (typeid == 1) game = 'wingo';
+        if (typeid == 3) game = 'wingo3';
+        if (typeid == 5) game = 'wingo5';
+        if (typeid == 10) game = 'wingo10';
 
-    if (typeid != 1 && typeid != 3 && typeid != 5 && typeid != 10) {
-        return res.status(200).json({
-            message: 'Error!',
-            status: true
+        const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
+        if (!user || !user[0]) {
+            return res.status(200).json({ code: 0, msg: "Unauthorized", data: { gameslist: [] }, status: false });
+        }
+
+        const [minutes_1] = await connection.query(`SELECT * FROM minutes_1 WHERE phone = ? AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto}`, [user[0].phone]);
+        const [minutes_1All] = await connection.query(`SELECT * FROM minutes_1 WHERE phone = ? AND game = '${game}' ORDER BY id DESC `, [user[0].phone]);
+
+        let page = Math.ceil(minutes_1All.length / 10) || 1;
+        let datas = (minutes_1 || []).map((data) => {
+            let { id, phone, code, invite, level, game, ...others } = data;
+            return others;
         });
-    }
 
-    if (pageno < 0 || pageto < 0) {
-        return res.status(200).json({
-            code: 0,
-            msg: "Không còn dữ liệu",
-            data: {
-                gameslist: [],
-            },
-            status: false
-        });
-    }
-    let auth = req.cookies.auth;
-
-    let game = '';
-    if (typeid == 1) game = 'wingo';
-    if (typeid == 3) game = 'wingo3';
-    if (typeid == 5) game = 'wingo5';
-    if (typeid == 10) game = 'wingo10';
-
-    const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1 ', [auth]);
-    const [minutes_1] = await connection.query(`SELECT * FROM minutes_1 WHERE phone = ? AND game = '${game}' ORDER BY id DESC LIMIT ${Number(pageno) + ',' + Number(pageto)}`, [user[0].phone]);
-    const [minutes_1All] = await connection.query(`SELECT * FROM minutes_1 WHERE phone = ? AND game = '${game}' ORDER BY id DESC `, [user[0].phone]);
-
-    if (!minutes_1[0]) {
         return res.status(200).json({
             code: 0,
-            msg: "Không còn dữ liệu",
+            msg: "Success",
             data: {
-                gameslist: [],
+                gameslist: datas,
             },
-            status: false
-        });
-    }
-    if (!pageno || !pageto || !user[0] || !minutes_1[0]) {
-        return res.status(200).json({
-            message: 'Error!',
+            page: page,
             status: true
         });
+    } catch (error) {
+        console.error('Error in GetMyEmerdList:', error);
+        return res.status(200).json({ code: 0, msg: "Error", data: { gameslist: [] }, status: true });
     }
-    let page = Math.ceil(minutes_1All.length / 10);
-
-    let datas = minutes_1.map((data) => {
-        let { id, phone, code, invite, level, game, ...others } = data;
-        return others;
-    });
-
-    return res.status(200).json({
-        code: 0,
-        msg: "Nhận thành công",
-        data: {
-            gameslist: datas,
-        },
-        page: page,
-        status: true
-    });
 }
 
 const addWinGo = async (game) => {
