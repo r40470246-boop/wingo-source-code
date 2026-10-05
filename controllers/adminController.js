@@ -78,26 +78,22 @@ const settings = async(req, res) => {
 
 // xác nhận admin
 const middlewareAdminController = async(req, res, next) => {
-    // xác nhận token
     const auth = req.cookies.auth;
     if (!auth) {
         return res.redirect("/login");
     }
-    const [rows] = await connection.execute('SELECT `token`,`level`, `status` FROM `users` WHERE `token` = ? AND veri = 1', [auth]);
-    if (!rows) {
-        return res.redirect("/login");
-    }
     try {
-        if (auth == rows[0].token && rows[0].status == 1) {
-            if (rows[0].level == 1) {
-                next();
-            } else {
-                return res.redirect("/home");
-            }
-        } else {
+        const [rows] = await connection.execute('SELECT `token`,`level`, `status` FROM `users` WHERE `token` = ? AND veri = 1', [auth]);
+        if (!rows || rows.length === 0) {
             return res.redirect("/login");
         }
+        if (rows[0].status == 1 && (rows[0].level == 1 || rows[0].level == 2)) {
+            next();
+        } else {
+            return res.redirect("/home");
+        }
     } catch (error) {
+        console.log(error);
         return res.redirect("/login");
     }
 }

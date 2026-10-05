@@ -79,6 +79,8 @@ const login = async(req, res) => {
                     timeNow: timeNow
                 }, secret, { expiresIn: "1d" });
                 await connection.execute('UPDATE `users` SET `token` = ? WHERE `phone` = ? ', [md5(accessToken), username]);
+                res.cookie('auth', md5(accessToken), { maxAge: 86400000, path: '/' });
+                res.cookie('token', accessToken, { maxAge: 86400000, path: '/' });
                 return res.status(200).json({
                     message: 'Login Sucess',
                     status: true,
