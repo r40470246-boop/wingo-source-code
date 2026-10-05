@@ -114,6 +114,9 @@ CREATE TABLE IF NOT EXISTS `level` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Initial Seed Data
+INSERT INTO `users` (`id`, `phone`, `password`, `code`, `invite`, `money`, `level`, `veri`, `status`, `time`) VALUES
+(1, '9999999999', '482c811da5d5b4bc6d497ffa98491e38', 'ADMIN123', '0', 100000, 2, 1, 1, '1655689155500');
+
 INSERT INTO `admin` (`id`, `wingo1`, `wingo3`, `wingo5`, `wingo10`, `k5d`, `k5d3`, `k5d5`, `k5d10`, `k3d`, `k3d3`, `k3d5`, `k3d10`, `win_rate`, `telegram`, `cskh`, `app`) VALUES
 (1, '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', 80, 'https://t.me/support', 'https://t.me/support', '#');
 
